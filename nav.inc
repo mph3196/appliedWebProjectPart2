@@ -11,5 +11,8 @@
     <a <?php if($currentPage == 'about') echo 'class="active"'; ?> href="about.php">
       <i class="fa fa-fw fa-star"></i> About Us
     </a>
+    <a <?php if($currentPage == 'login') echo 'class="active"'; ?> href="login.php">
+      <i class=""></i> Login
+    </a>
   </nav>
 </header>

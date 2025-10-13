@@ -1,27 +1,30 @@
 <?php
+    require_once "settings.php";
+?>
 
-$currentPage = 'manage';
-$pageTitle = 'JSM Management Page';
-$pageDescription = 'Careers page for JSM website';
-$pageHeading = 'Careers - Positions Available';
-
+<?php
+$currentPage = 'Manage';
+$pageTitle = 'JSM Manage Page';
+$pageDescription = 'Manage page for JSM website';
+$pageHeading = 'Manage EOIs - HR Manager';
 include 'header.inc';
 include 'nav.inc';
 ?>
 
+<!-- Used Gen AI to help with styling and layout of this page -->
+<header style="display:flex; justify-content:space-between; align-items:center; background:#1976d2; color:white; padding:1em;">
+    <h2 style="margin:0;">Welcome, Admin</h2>
+    <a href="logout.php" style="
+        background:white;
+        color:#1976d2;
+        padding:0.5em 1em;
+        border-radius:6px;
+        text-decoration:none;
+        font-weight:bold;
+    ">Logout</a>
+</header>
+
 <?php
-    // Include database settings
-    require_once 'settings.php';
-    // Create connection
-    $conn = new mysqli($host, $user, $pwd, $sql_db);
-    // Check connection
-    if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-if (isset($_GET['model'])) {
-    $model = mysqli_real_escape_string($conn, $_GET['model']);
-    $sql = "SELECT * FROM cars WHERE model LIKE '%$model%'";
-    $result = mysqli_query($conn, $sql);
-}
 
 ?>
+<?php include 'footer.inc'; ?>
