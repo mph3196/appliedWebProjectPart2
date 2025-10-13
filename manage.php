@@ -1,7 +1,7 @@
 <?php
 
-$currentPage = 'jobs';
-$pageTitle = 'JSM Jobs Applications Page';
+$currentPage = 'manage';
+$pageTitle = 'JSM Management Page';
 $pageDescription = 'Careers page for JSM website';
 $pageHeading = 'Careers - Positions Available';
 
