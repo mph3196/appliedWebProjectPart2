@@ -21,7 +21,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         exit();
 
     } else {
-        $sql = "SELECT * FROM admins WHERE username='$username' AND password='$password'";
+        $sql = "SELECT * FROM user WHERE username='$username' AND password='$password'";
         $result = $mysqli->query($sql);
 
         if (mysqli_num_rows($result) === 1) {
