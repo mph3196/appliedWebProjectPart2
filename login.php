@@ -1,77 +1,126 @@
+<?php require_once "settings.php";?>
+
 <?php
-$currentPage = 'login';
-$pageTitle = 'JSM Manager Login';
-$pageDescription = 'Login page for managers to access HR system';
-$pageHeading = 'Login - Manager Access';
+$currentPage = 'Login';
+$pageTitle = 'JSM Login Page';
+$pageDescription = 'Login page for JSM website';
+$pageHeading = 'Login - HR Manager';
 include 'header.inc';
 include 'nav.inc';
 ?>
 
-<?php
-// If user already logged in, redirect to manage.php
-if (isset($_SESSION['username'])) {
-    header('Location: manage.php');
-    exit();
-}
+<head>
+    <style>
+        * {
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
 
-// Automatically remove login block after time expires
-if (isset($_SESSION['blockedFromLogin']) && time() > $_SESSION['blockedFromLogin']) {
-    unset($_SESSION['blockedFromLogin']);
-    unset($_SESSION['wrongLoginAttempts']);
-}
+        body {
+            display: grid;
+            grid-template-rows: auto 1fr auto; 
+            grid-template-columns: 100%; 
+            min-height: 100vh; 
+            margin: 0;
+            background: #f0f0f0;
+            padding: 0;
+        }
+        
+        .main-content-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            padding: 40px 20px;
+            width: 100%;
+        }
 
-// For displaying an optional error message
-$error = '';
-if (isset($_SESSION['loginError'])) {
-    $error = $_SESSION['loginError'];
-    unset($_SESSION['loginError']);
-}
-?>
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-<main style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
-    <div class="login-container" style="
-        background: white;
-        padding: 2em;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        width: 320px;
-        font-family: Arial, sans-serif;
-    ">
-        <h2 style="text-align:center; color:#333;">Manager Login</h2>
+        form {
+            width: 400px;
+            max-width: 90%; 
+            border: 1px solid #ddd;
+            padding: 30px;
+            background: white; 
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
 
-        <?php
-        // If blocked after 3 failed attempts
-        if (isset($_SESSION['blockedFromLogin'])) {
-            echo '<div class="login-error" style="text-align:center; color:#b71c1c;">
-                    <h3>Access blocked</h3>
-                    <p>You entered the wrong username or password 3 times.</p>
-                    <p>Your device is blocked until: <strong>',
-                        date("d/m/Y H:i:s", $_SESSION['blockedFromLogin']),
-                    '</strong></p>
-                    <a href="index.php" style="display:inline-block; margin-top:1em; background:#1976d2; color:white; padding:0.5em 1em; border-radius:5px; text-decoration:none;">Back to Home</a>
-                  </div>';
-        } else {
-        ?>
-            <form method="post" action="process_login.php">
-                <label>Username:</label>
-                <input type="text" name="username" required
-                    style="width:100%; padding:0.7em; margin:0.5em 0; border:1px solid #ccc; border-radius:6px;">
+        input {
+            display: block;
+            border: 1px solid #ccc;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            margin-top: 5px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        label {
+            color: #555;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 0;
+            margin-top: 10px;
+            display: block;
+        }
 
-                <label>Password:</label>
-                <input type="password" name="password" required
-                    style="width:100%; padding:0.7em; margin:0.5em 0; border:1px solid #ccc; border-radius:6px;">
+        button {
+            align-self: flex-end;
+            background: #007bff;
+            padding: 10px 15px;
+            color: #fff;
+            border-radius: 5px;
+            margin-top: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
 
-                <input type="submit" value="Login"
-                    style="width:100%; padding:0.7em; background:#1976d2; color:white; border:none; border-radius:6px; cursor:pointer;">
-            </form>
+        button:hover {
+            background: #0056b3;
+            opacity: 1;
+        }
 
-            <?php if (!empty($error)): ?>
-                <div style="color:red; text-align:center; margin-top:1em;">
-                    <?= htmlspecialchars($error) ?>
-                </div>
-            <?php endif; ?>
-        <?php } ?>
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content-area">
+        <h2><?php echo $currentPage; ?></h2> 
+        
+        <form action="process_login.php" method="post"> 
+            <?php
+            if (isset($_GET['error'])) { ?>
+                <p class='error'><?php echo $_GET['error']; ?></p>
+            <?php } ?>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            
+            <button type="submit">Login</button>
+        </form>
     </div>
-</main>
-
+    
 <?php include 'footer.inc'; ?>

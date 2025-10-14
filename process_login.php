@@ -1,57 +1,48 @@
 <?php
-// process_login.php — secure login processor with roles + timeout
+require "database.php";
+require_once "settings.php";
 session_start();
-require_once 'settings.php'; // defines $conn
+if (isset($_POST['username']) && isset($_POST['password'])) {
 
-// Redirect back if accessed directly
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: login.php");
-    exit;
-}
-
-$username = $_POST['username'];
-$password = $_POST['password'];
-
-// Basic validation
-if ($username === 'Admin' && $password === 'Admin') {
-    $_SESSION['user'] = $username;
-    header('Location: manage.php');
-} else {
-    echo "Invalid login.<a href='login.html'>Try again</a>";
-}
-if (empty($username) || empty($password)) {
-    $_SESSION['error'] = "Username and password are required.";
-    header("Location: login.php");
-    exit;
-}
-// Prepare and execute secure query
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($user = $result->fetch_assoc()) {
-    if (password_verify($password, $user['password_hash'])) {
-        // Password verified — set secure session variables
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'] ?? 'Manager';
-        $_SESSION['last_activity'] = time(); // record login time
-
-        // Optional: regenerate session ID to prevent session fixation
-        session_regenerate_id(true);
-
-        header("Location: manage.php");
-        exit;
-    } else {
-        $_SESSION['error'] = "Invalid password.";
-        header("Location: login.php");
-        exit;
+    function validate($data) {
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
     }
-} else {
-    $_SESSION['error'] = "User not found.";
-    header("Location: login.php");
+    $username = ($_POST['username']);
+    $password = ($_POST['password']);
+
+    if (empty($username)) {
+        header('Location: login.php?error=Username is required');
+        exit();
+    } else if (empty($password)) {
+        header('Location: login.php?error=Password is required');
+        exit();
+
+    } else {
+        $sql = "SELECT * FROM admins WHERE username='$username' AND password='$password'";
+        $result = $mysqli->query($sql);
+
+        if (mysqli_num_rows($result) === 1) {
+            $row = mysqli_fetch_assoc($result);
+            if ($row['username'] === $username && $row['password'] === $password) {
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['name'] = $row['name'];
+                $_SESSION['id'] = $row['id'];
+                header('Location: manage.php');
+                exit();
+            } else {
+                header('Location: login.php?error=Incorect Username or password');
+                exit();
+            }
+        } else {
+            header('Location: login.php?error=Incorect Username or password');
+            exit();
+        }
+    }
+
+}else {
+    header('Location: login.php');
     exit;
 }
-
-$stmt->close();
-$conn->close();
-?>
