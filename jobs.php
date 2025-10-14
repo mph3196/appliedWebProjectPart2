@@ -7,6 +7,17 @@ $pageHeading = 'Careers - Positions Available';
 
 include 'header.inc';
 include 'nav.inc';
+
+require_once 'settings.php'; // Connect to database
+$conn = new mysqli($host, $user, $password, $database); // Create connection
+$sql = "SELECT * FROM jobs ORDER BY id ASC";// Fetch all jobs from database
+$result = $conn->query($sql);
+$jobs = [];// Store jobs in array
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $jobs[] = $row;
+    }
+}
 ?>
 
   <aside> <!--Required aside -->
