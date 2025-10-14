@@ -6,6 +6,29 @@ $pageHeading = 'About Us';
 
 include 'header.inc';
 include 'nav.inc';
+
+// Connect to database and fetch member contributions
+require_once 'settings.php';
+
+// Create connection
+$conn = new mysqli($host, $user, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch all team members from about table
+$sql = "SELECT * FROM about ORDER BY id ASC";
+$result = $conn->query($sql);
+
+// Store members in array for later use
+$members = [];
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $members[] = $row;
+    }
+}
 ?>
 
 
@@ -52,67 +75,70 @@ Above all, we are committed to nurturing minds and inspiring futures—helping e
   </ul>
 </aside>
 
-  <div class="container">
-    <div class="header"><strong>Jonathon</strong></div>
-    <p>Jonathon is a 21 year old male and second year student from Melbourne Australia, he is currently pursuing a Bachelors Degree in Computer Science, majoring in Cyber Security</p>
-    <p><strong>Role:</strong>Team Leader – keeping team on track to meet all set targets and deadlines</p>
-    <p><strong>Role:</strong>Lead Designer – maintaining a consistent, uniform and professional style across all pages of the site</p><br>
+<?php
+// Display each team member's details dynamically
+foreach($members as $member):
+    $firstName = explode(' ', $member['name'])[0]; // Get first name
+?>
+<div class="container">
+    <div class="header"><strong><?php echo htmlspecialchars($firstName); ?></strong></div>
+    
+    <?php if($firstName == 'Jonathon'): ?>
+      <p>Jonathon is a 21 year old male and second year student from Melbourne Australia, he is currently pursuing a Bachelors Degree in Computer Science, majoring in Cyber Security</p>
+      <p><strong>Role:</strong>Team Leader – keeping team on track to meet all set targets and deadlines</p>
+      <p><strong>Role:</strong>Lead Designer – maintaining a consistent, uniform and professional style across all pages of the site</p><br>
+    <?php elseif($firstName == 'Shaun'): ?>
+      <p>Shaun is a 19 year old male first year student from Melbourne Australia, he is currently pursuing a Bachelors Degree in Data Science</p>
+      <p><strong>Role:</strong>Communications Manager – organising communication between team members, setting times for meetings, convening with teacher (Atie)</p><br>
+    <?php elseif($firstName == 'Morgan'): ?>
+      <p>Morgan is a 36 year old male first year student from Melbourne, Australia. He is currently pursuing a Bachelors Degree in Data Science</p>
+      <p><strong>Role:</strong>Lead Developer – ensuring functional html, CSS etc., markup validity and proper documentation and commenting for all pages of the site </p><br>
+    <?php endif; ?>
+    
     <p><strong>Contributions:</strong></p>
     <ul>
-      <li><strong>Individual Responsibility:</strong>jobs.html</li>
-      <li><strong>Shared Responsibilities:</strong>index.html, styles.css, Jira board</li>
+      <li><strong>Project 1:</strong> <?php echo htmlspecialchars($member['project1_contributions']); ?></li>
+      <li><strong>Project 2:</strong> <?php echo htmlspecialchars($member['project2_contributions']); ?></li>
     </ul>
-    <p><strong>Favourite Hobbies:</strong></p>
-    <ul>
-      <li>Muay Thai</li>
-      <li>Hiking</li>
-      <li>Gaming</li>
-      <li>Watching MMA</li>
-    </ul>
-    <p><strong>Favourite Language</strong>: Dutch </p>
-    <p><strong>Famous Quote in Dutch:</strong> “Streef niet naar succes als dat is wat je wilt; gewoon doen waar je van houdt en in gelooft en de rest komt vanzelf.”</p>
+    
+    <?php if($firstName == 'Jonathon'): ?>
+      <p><strong>Favourite Hobbies:</strong></p>
+      <ul>
+        <li>Muay Thai</li>
+        <li>Hiking</li>
+        <li>Gaming</li>
+        <li>Watching MMA</li>
+      </ul>
+      <p><strong>Favourite Language</strong>: Dutch </p>
+      <p><strong>Famous Quote in Dutch:</strong> "Streef niet naar succes als dat is wat je wilt; gewoon doen waar je van houdt en in gelooft en de rest komt vanzelf."</p>
+    <?php elseif($firstName == 'Shaun'): ?>
+      <p><strong>Favourite Hobbies:</strong></p>
+      <ul>
+        <li>Gaming</li>
+        <li>Reading</li>
+        <li>Football(Soccer)</li>
+        <li>Playing Sport</li>
+      </ul>
+      <p><strong>Favourite Language</strong>: Portuguese </p>
+      <p><strong>Famous Quote in Portuguese:</strong> "A melhor vingança é ser diferente daquele que causou o dano."</p>
+    <?php elseif($firstName == 'Morgan'): ?>
+      <p><strong>Favourite Hobbies:</strong></p>
+      <ul>
+        <li>Gaming</li>
+        <li>Cycling</li>
+        <li>Drinking</li>
+        <li>Dancing to Techno</li>
+      </ul>
+      <p><strong>Favourite Language</strong>: Mandarin </p>
+      <p><strong>Favourite quote in Mandarin:</strong> "天下萬物都處於徹底的混亂之中;情況非常好。"
+    <?php endif; ?>
   </div>
-  
-<div class="container">
-    <div class="header"><strong>Shaun</strong></div>
-    <p>Shaun is a 19 year old male first year student from Melbourne Australia, he is currently pursuing a Bachelors Degree in Data Science</p>
-    <p><strong>Role:</strong>Communications Manager – organising communication between team members, setting times for meetings, convening with teacher (Atie)</p><br>
-    <p><strong>Contributions:</strong></p>
-    <ul>
-      <li><strong>Individual Responsibility:</strong>about.html</li>
-      <li><strong>Shared Responsibilities:</strong>index.html, styles.css, Jira board</li>
-    </ul>
-    <p><strong>Favourite Hobbies:</strong></p>
-    <ul>
-      <li>Gaming</li>
-      <li>Reading</li>
-      <li>Football(Soccer)</li>
-      <li>Playing Sport</li>
-    </ul>
-    <p><strong>Favourite Language</strong>: Portuguese </p>
-    <p><strong>Famous Quote in Portuguese:</strong> “A melhor vingança é ser diferente daquele que causou o dano.”
-</p>
-</div>
+<?php endforeach; ?>
 
-<div class="container">
-    <div class="header"><Strong>Morgan</Strong></div>
-    <p>Morgan is a 36 year old male first year student from Melbourne, Australia. He is currently pursuing a Bachelors Degree in Data Science</p>
-    <p><strong>Role:</strong>Lead Developer – ensuring functional html, CSS etc., markup validity and proper documentation and commenting for all pages of the site </p><br>
-    <p><strong>Contributions:</strong></p>
-    <ul>
-      <li><strong>Individual Responsibility:</strong>apply.html</li>
-      <li><strong>Shared Responsibilities:</strong>index.html, styles.css, Jira board</li>
-    </ul>
-    <p><strong>Favourite Hobbies:</strong></p>
-    <ul>
-      <li>Gaming</li>
-      <li>Cycling</li>
-      <li>Drinking</li>
-      <li>Dancing to Techno</li>
-    </ul>
-    <p><strong>Favourite Language</strong>: Mandarin </p>
-    <p><strong>Favourite quote in Mandarin:</strong> “天下萬物都處於徹底的混亂之中;情況非常好。”
-</div>
+<?php
+// Close database connection
+$conn->close();
+?>
 
 <!--Table of funfacts about the team-->
 <h2 id="funfacts"><strong>Fun Facts</strong></h2>
