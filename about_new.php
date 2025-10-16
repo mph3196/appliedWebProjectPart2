@@ -14,9 +14,6 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$sql = "SELECT * FROM Member";
-$members = mysqli_query($conn, $sql);
-
 // HTML Content
 echo '<h1><strong>Who are We</strong></h1>';
 echo '<p class="aboutus">';
@@ -46,6 +43,11 @@ echo '<aside id="teaminfo">';
 echo '<h3><strong>Student ID\'s</strong></h3>';
 echo '<ul>';
 
+// Get the members
+$sql = "SELECT * FROM Member";
+$members = mysqli_query($conn, $sql);
+
+// Dynamically display Team Members and their (student) ID 
 while ($member = mysqli_fetch_assoc($members)) {
     echo "<li>" . $member['FullName'] . " - " . $member['MemberID'] . "</li>";
 }
@@ -53,6 +55,47 @@ while ($member = mysqli_fetch_assoc($members)) {
 echo '</ul>';
 echo '</aside>';
 
+// Get the members
+$sql = "SELECT * FROM Member";
+$members = mysqli_query($conn, $sql);
+
+// Dynamically display each team member's details
+while ($member = mysqli_fetch_assoc($members)) {
+    echo '<div class="container">';
+	echo '<div class="header"><strong>' . $member['FullName'] . '</strong></div>';
+	
+    echo '<p>' . $member['Bio'] . '</p>';
+	
+	$sql = "SELECT * FROM Role WHERE MemberID = '" . $member['MemberID'] . "'";
+	$roles = mysqli_query($conn, $sql);
+	
+	while ($role = mysqli_fetch_assoc($roles)) {
+		echo '<p><strong>Role: </strong>' . $role['Description'] . '</p>';
+	}
+	
+	echo '<p><strong>Contributions:</strong></p>';
+	echo '<ul>';
+	echo '<li><strong>Individual Responsibility:</strong>NEED TO DYNAMISE</li>';
+    echo '<li><strong>Shared Responsibilities:</strong>NEED TO DYNAMISE</li>';
+	echo '</ul>';
+	echo '<p><strong>Favourite Hobbies:</strong></p>';
+	echo '<ul>';
+	
+	$sql = "SELECT * FROM Hobby WHERE MemberID = '" . $member['MemberID'] . "'";
+	$hobbies = mysqli_query($conn, $sql);
+	
+	while ($hobby = mysqli_fetch_assoc($hobbies)) {
+		echo '<li>' . $hobby['Description'] . '</li>';
+	}
+	
+	echo '</ul>';
+	echo '<p><strong>Favourite Language</strong>: ' . $member['FavLanguage'] . '</p>';
+	echo '<p><strong>Favourite Quote in ' . $member['FavLanguage'] . ': </strong> \"' . $member['FavQuote'] . '"</p>';
+    echo '</div>';
+}	
+
 mysqli_close($conn);
+
 include 'footer.inc';
+
 ?>
