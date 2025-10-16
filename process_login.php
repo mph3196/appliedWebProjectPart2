@@ -1,7 +1,9 @@
 <?php
-require "database.php";
-require_once "settings.php";
 session_start();
+
+require_once "settings.php";
+$conn = mysqli_connect($host, $user, $password, $database);
+
 if (isset($_POST['username']) && isset($_POST['password'])) {
 
     function validate($data) {
@@ -22,14 +24,15 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     } else {
         $sql = "SELECT * FROM user WHERE username='$username' AND password='$password'";
-        $result = $mysqli->query($sql);
+        $result = mysqli_query($conn, $sql);
 
-        if (mysqli_num_rows($result) === 1) {
-            $row = mysqli_fetch_assoc($result);
-            if ($row['username'] === $username && $row['password'] === $password) {
-                $_SESSION['username'] = $row['username'];
-                $_SESSION['name'] = $row['name'];
-                $_SESSION['id'] = $row['id'];
+        if (mysqli_num_rows($result) == 1) {
+            $user = mysqli_fetch_assoc($result);
+
+            if ($user['Username'] === $username && $user['Password'] === $password) {
+                $_SESSION['username'] = $user['Username'];
+                $_SESSION['name'] = $user['FullName'];
+                $_SESSION['id'] = $user['id'];
                 header('Location: manage.php');
                 exit();
             } else {

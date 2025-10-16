@@ -1,6 +1,6 @@
-<?php require_once "settings.php";?>
-
 <?php
+require_once "settings.php";
+
 $currentPage = 'Login';
 $pageTitle = 'JSM Login Page';
 $pageDescription = 'Login page for JSM website';
