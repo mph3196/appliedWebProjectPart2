@@ -15,24 +15,25 @@ DROP TABLE User;
 
 CREATE TABLE	User (
 	ID 		        INT PRIMARY KEY AUTO_INCREMENT,
-    Username        VARCHAR(128) NOT NULL,
+    Username        VARCHAR(128) NOT NULL UNIQUE,
     Password        Varchar(255) NOT NULL,
-    FullName        Varchar(128),
+    Name            Varchar(128),
+    Member          Boolean,
     login_attempts  INT,
-    lockout_time    DATETIME,
+    lockout_time    DATETIME
 );
 
-INSERT INTO		User(Username, Password, FullName)
-VALUES 			('jtaylor', 'swinburne', "Jonathon Taylor");
+INSERT INTO		User(Username, Password, Name, Member)
+VALUES 			('jtaylor', 'swinburne', 'Jonathon', True);
 
-INSERT INTO		User(Username, Password, FullName)
-VALUES 			('mhopkins', 'swinburne', 'Morgan Hopkins');
+INSERT INTO		User(Username, Password, Name, Member)
+VALUES 			('mhopkins', 'swinburne', 'Morgan', True);
 
-INSERT INTO		User(Username, Password, FullName)
-VALUES 			('svambe', 'swinburne', 'Shaun Vambe');
+INSERT INTO		User(Username, Password, Name, Member)
+VALUES 			('svambe', 'swinburne', 'Shaun', True);
 
-INSERT INTO		User(Username, Password, FullName)
-VALUES 			('admin', 'admin', 'Administrator');
+INSERT INTO		User(Username, Password, Name, Member)
+VALUES 			('admin', 'admin', 'Administrator', False);
 
 -- ABOUT TABLE
 
