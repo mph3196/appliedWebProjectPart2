@@ -14,15 +14,29 @@ VALUES			('ab123');
 DROP TABLE User;
 
 CREATE TABLE	User (
-	ID 		INT PRIMARY KEY AUTO_INCREMENT;
+	ID 		        INT PRIMARY KEY AUTO_INCREMENT,
+    Username        VARCHAR(128) NOT NULL,
+    Password        Varchar(255) NOT NULL,
+    FullName        Varchar(128),
+    login_attempts  INT,
+    lockout_time    DATETIME,
 );
 
-INSERT INTO		User(ID)
-VALUES 			('1');
+INSERT INTO		User(Username, Password, FullName)
+VALUES 			('jtaylor', 'swinburne', "Jonathon Taylor");
 
-DROP TABLE About;
+INSERT INTO		User(Username, Password, FullName)
+VALUES 			('mhopkins', 'swinburne', 'Morgan Hopkins');
+
+INSERT INTO		User(Username, Password, FullName)
+VALUES 			('svambe', 'swinburne', 'Shaun Vambe');
+
+INSERT INTO		User(Username, Password, FullName)
+VALUES 			('admin', 'admin', 'Administrator');
 
 -- ABOUT TABLE
+
+DROP TABLE About;
 
 CREATE TABLE	ABOUT(
 	AID			INT PRIMARY KEY AUTO_INCREMENT,
