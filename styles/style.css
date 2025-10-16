@@ -31,6 +31,8 @@ body { /* White background */
 .navbar { /* Navigation bar styles */
   text-align: center; /* Aligns text */
   margin-left: auto; /* Pushes navbar items to the left in flex */
+  display: flex; /* Flexbox for horizontal layout */
+  flex-shrink: 0; /* Prevents shrinking */  
 }
 .navbar a { 
   text-decoration: none; /* Remove underline from links */
@@ -780,3 +782,19 @@ legend {
     align-items: flex-start;
   }
 }
+
+/* Adjustments to navbar to better align icons and text */
+.navbar a { 
+    white-space: nowrap; 
+    display: inline-flex; /* Use flex to align icon and text together */
+    align-items: center; /* Vertically centers the icon and text within the link */
+    margin-left: 15px; /* Slightly reduce the spacing margin if 20px is too wide */
+}
+
+/* Specific styling for the icons */
+.navbar a i {
+    /* Ensures the icon has a consistent size relative to the text */
+    font-size: 1em; 
+    margin-right: 5px; /* Small gap between the icon and the text */
+}
+/* End of navbar icon styles */
