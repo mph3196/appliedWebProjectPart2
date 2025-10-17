@@ -1,4 +1,7 @@
--- JOBS TABLE
+-- JOBS TABLE 
+DROP TABLE IF EXISTS JobPreferable;
+DROP TABLE IF EXISTS JobEssential;
+DROP TABLE IF EXISTS JobResponsibility;
 DROP TABLE IF EXISTS Jobs;
 
 CREATE TABLE Jobs(
@@ -7,60 +10,107 @@ CREATE TABLE Jobs(
     Title VARCHAR(100) NOT NULL,
     Salary VARCHAR(50) NOT NULL,
     ReportsTo VARCHAR(100) NOT NULL,
-    ShortDescription TEXT NOT NULL,
-    KeyResponsibilities TEXT NOT NULL,
-    EssentialRequirements TEXT NOT NULL,
-    PreferableRequirements TEXT
+    ShortDescription TEXT NOT NULL
 );
 
--- Insert the 4 job positions
-INSERT INTO Jobs(RefNo, Title, Salary, ReportsTo, ShortDescription, KeyResponsibilities, EssentialRequirements, PreferableRequirements)
-VALUES (
-    'G03A1',
-    'IT Support Officer',
-    '$78,000 – $85,000 per annum',
-    'Manager, Digital Learning & Research Support',
-    'Join our IT department to provide frontline support for digital learning platforms and research technologies that enhance teaching, learning, and innovation.',
-    'Provide technical support for digital learning platforms (LMS, collaboration tools).|Assist researchers with software, data storage, and secure computing resources.|Maintain system documentation and user guides.|Ensure accessibility and compliance with IT security policies.',
-    'Bachelor degree in Information Technology or related field.|Experience supporting digital learning or research systems.|Strong communication and problem-solving skills.',
-    'Knowledge of accessibility standards in digital education.|Experience with cloud-based platforms (e.g., Microsoft Azure, AWS).|Familiarity with research data management practices.'
+-- Insert core data into the Jobs table
+INSERT INTO Jobs(RefNo, Title, Salary, ReportsTo, ShortDescription) VALUES 
+('G03A1', 'IT Support Officer', '$78,000 – $85,000 per annum', 'Manager, Digital Learning & Research Support', 'Join our IT department to provide frontline support for digital learning platforms and research technologies that enhance teaching, learning, and innovation.'),
+('G03C3', 'Research Data Analyst', '$88,000 – $95,000 per annum', 'Senior Research IT Coordinator', 'Provide data management, analytics, and visualization support for academic research projects.'),
+('G03B2', 'Learning Technology Specialist', '$82,000 – $90,000 per annum', 'Manager, Digital Learning & Research Support', 'Support academics in designing and delivering online and blended learning experiences using the university digital platforms.'),
+('G03D4', 'Systems Administrator', '$92,000 – $105,000 per annum', 'Head of IT Infrastructure', 'Maintain and secure the IT infrastructure supporting digital learning and research systems.');
+
+-- 1. Table for Key Responsibilities 
+CREATE TABLE JobResponsibility (
+    RespID INT PRIMARY KEY AUTO_INCREMENT,
+    RefNo VARCHAR(5) NOT NULL,
+    Description VARCHAR(1024) NOT NULL,
+    FOREIGN KEY (RefNo) REFERENCES Jobs(RefNo) ON DELETE CASCADE
 );
 
-INSERT INTO Jobs(RefNo, Title, Salary, ReportsTo, ShortDescription, KeyResponsibilities, EssentialRequirements, PreferableRequirements)
-VALUES (
-    'G03C3',
-    'Research Data Analyst',
-    '$88,000 – $95,000 per annum',
-    'Senior Research IT Coordinator',
-    'Provide data management, analytics, and visualization support for academic research projects.',
-    'Support researchers with secure data storage solutions.|Assist in statistical analysis and visualization.|Ensure compliance with data security and ethics requirements.',
-    'Bachelor Degree in Data Science, Statistics, or IT.|Experience with R, Python, or SPSS.',
-    'Knowledge of big data tools (Hadoop, Spark).|Experience in higher education research projects.'
+-- G03A1: Key Responsibilities
+INSERT INTO JobResponsibility (RefNo, Description) VALUES
+('G03A1', 'Provide technical support for digital learning platforms (LMS, collaboration tools).'),
+('G03A1', 'Assist researchers with software, data storage, and secure computing resources.'),
+('G03A1', 'Maintain system documentation and user guides.'),
+('G03A1', 'Ensure accessibility and compliance with IT security policies.');
+
+-- G03C3: Key Responsibilities
+INSERT INTO JobResponsibility (RefNo, Description) VALUES
+('G03C3', 'Support researchers with secure data storage solutions.'),
+('G03C3', 'Assist in statistical analysis and visualization.'),
+('G03C3', 'Ensure compliance with data security and ethics requirements.');
+
+-- G03B2: Key Responsibilities
+INSERT INTO JobResponsibility (RefNo, Description) VALUES
+('G03B2', 'Train staff in effective use of the Learning Management System (LMS).'),
+('G03B2', 'Collaborate on course design to ensure accessibility and engagement.'),
+('G03B2', 'Evaluate and recommend new learning technologies.');
+
+-- G03D4: Key Responsibilities
+INSERT INTO JobResponsibility (RefNo, Description) VALUES
+('G03D4', 'Manage servers, networks, and cloud environments.'),
+('G03D4', 'Ensure uptime and security of digital platforms.'),
+('G03D4', 'Implement system updates, patches, and backups.');
+
+-- 2. Table for Essential Requirements 
+CREATE TABLE JobEssential (
+    EssentialID INT PRIMARY KEY AUTO_INCREMENT,
+    RefNo VARCHAR(5) NOT NULL,
+    Description VARCHAR(1024) NOT NULL,
+    FOREIGN KEY (RefNo) REFERENCES Jobs(RefNo) ON DELETE CASCADE
 );
 
-INSERT INTO Jobs(RefNo, Title, Salary, ReportsTo, ShortDescription, KeyResponsibilities, EssentialRequirements, PreferableRequirements)
-VALUES (
-    'G03B2',
-    'Learning Technology Specialist',
-    '$82,000 – $90,000 per annum',
-    'Manager, Digital Learning & Research Support',
-    'Support academics in designing and delivering online and blended learning experiences using the university digital platforms.',
-    'Train staff in effective use of the Learning Management System (LMS).|Collaborate on course design to ensure accessibility and engagement.|Evaluate and recommend new learning technologies.',
-    'Bachelor in Education Technology, IT, or similar.|Experience with LMS platforms (e.g., Canvas, Blackboard).',
-    'Knowledge of instructional design frameworks.|Familiarity with accessibility standards (WCAG).'
+-- G03A1: Essential Requirements
+INSERT INTO JobEssential (RefNo, Description) VALUES
+('G03A1', 'Bachelor degree in Information Technology or related field.'),
+('G03A1', 'Experience supporting digital learning or research systems.'),
+('G03A1', 'Strong communication and problem-solving skills.');
+
+-- G03C3: Essential Requirements
+INSERT INTO JobEssential (RefNo, Description) VALUES
+('G03C3', 'Bachelor Degree in Data Science, Statistics, or IT.'),
+('G03C3', 'Experience with R, Python, or SPSS.');
+
+-- G03B2: Essential Requirements
+INSERT INTO JobEssential (RefNo, Description) VALUES
+('G03B2', 'Bachelor in Education Technology, IT, or similar.'),
+('G03B2', 'Experience with LMS platforms (e.g., Canvas, Blackboard).');
+
+-- G03D4: Essential Requirements
+INSERT INTO JobEssential (RefNo, Description) VALUES
+('G03D4', 'Bachelor Degree in Information Systems or Computer Science.'),
+('G03D4', 'Experience with Linux/Windows server administration.');
+
+-- 3. Table for Preferable Requirements 
+CREATE TABLE JobPreferable (
+    PreferableID INT PRIMARY KEY AUTO_INCREMENT,
+    RefNo VARCHAR(5) NOT NULL,
+    Description VARCHAR(1024) NOT NULL,
+    FOREIGN KEY (RefNo) REFERENCES Jobs(RefNo) ON DELETE CASCADE
 );
 
-INSERT INTO Jobs(RefNo, Title, Salary, ReportsTo, ShortDescription, KeyResponsibilities, EssentialRequirements, PreferableRequirements)
-VALUES (
-    'G03D4',
-    'Systems Administrator',
-    '$92,000 – $105,000 per annum',
-    'Head of IT Infrastructure',
-    'Maintain and secure the IT infrastructure supporting digital learning and research systems.',
-    'Manage servers, networks, and cloud environments.|Ensure uptime and security of digital platforms.|Implement system updates, patches, and backups.',
-    'Bachelor Degree in Information Systems or Computer Science.|Experience with Linux/Windows server administration.',
-    'Knowledge of Cybersecurity frameworks.|Cloud certification (Azure, AWS, or GCP).'
-);
+-- G03A1: Preferable Requirements
+INSERT INTO JobPreferable (RefNo, Description) VALUES
+('G03A1', 'Knowledge of accessibility standards in digital education.'),
+('G03A1', 'Experience with cloud-based platforms (e.g., Microsoft Azure, AWS).'),
+('G03A1', 'Familiarity with research data management practices.');
+
+-- G03C3: Preferable Requirements
+INSERT INTO JobPreferable (RefNo, Description) VALUES
+('G03C3', 'Knowledge of big data tools (Hadoop, Spark).'),
+('G03C3', 'Experience in higher education research projects.');
+
+-- G03B2: Preferable Requirements
+INSERT INTO JobPreferable (RefNo, Description) VALUES
+('G03B2', 'Knowledge of instructional design frameworks.'),
+('G03B2', 'Familiarity with accessibility standards (WCAG).');
+
+-- G03D4: Preferable Requirements
+INSERT INTO JobPreferable (RefNo, Description) VALUES
+('G03D4', 'Knowledge of Cybersecurity frameworks.'),
+('G03D4', 'Cloud certification (Azure, AWS, or GCP).');
+
 
 -- USER TABLE
 
