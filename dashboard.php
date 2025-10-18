@@ -1,4 +1,5 @@
 <?php
+
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -20,7 +21,7 @@ require_once "settings.php";
 $currentPage = 'dashboard';
 $pageTitle = 'JSM Dashboard Page';
 $pageDescription = 'Dashboard page for users in JSM website';
-$pageHeading = 'User Dashboard Page';
+$pageHeading = 'Dashboard';
 
 include 'header.inc';
 include 'nav.inc';

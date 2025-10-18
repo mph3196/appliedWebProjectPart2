@@ -135,7 +135,7 @@ VALUES ('svambe', 'swinburne', 'Shaun', TRUE);
 INSERT INTO User(Username, Password, Name, Member)
 VALUES ('mhopkins', 'swinburne', 'Morgan', TRUE);
 
-INSERT INTO User(Username, Password, Name, Member)
+INSERT INTO User(Username, Password_hash, Name, Member)
 VALUES ('Admin', 'Admin', 'Administrator', FALSE);
 
 -- ABOUT TABLE
