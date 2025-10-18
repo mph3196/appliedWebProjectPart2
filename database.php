@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'login_appliedwebprojectpart2';
+$dbname = 'jsm_university';
 $username = 'root';
 $password = '';
 

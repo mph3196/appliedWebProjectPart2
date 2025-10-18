@@ -136,7 +136,7 @@ INSERT INTO User(Username, Password, Name, Member)
 VALUES ('mhopkins', 'swinburne', 'Morgan', TRUE);
 
 INSERT INTO User(Username, Password, Name, Member)
-VALUES ('admin', 'admin', 'Administrator', FALSE);
+VALUES ('Admin', 'Admin', 'Administrator', FALSE);
 
 -- ABOUT TABLE
 
