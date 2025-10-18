@@ -117,25 +117,23 @@ INSERT INTO JobPreferable (RefNo, Description) VALUES
 DROP TABLE IF EXISTS User;
 
 CREATE TABLE User (
-    ID INT PRIMARY KEY AUTO_INCREMENT,
-    Username VARCHAR(128) NOT NULL UNIQUE,
-    Password VARCHAR(255) NOT NULL,
-    Name VARCHAR(128),
-    Member BOOLEAN,
-    login_attempts INT,
-    lockout_time DATETIME
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(128) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(128),
+    member BOOLEAN,
 );
 
-INSERT INTO User(Username, Password, Name, Member)
+INSERT INTO user(username, password_hash, name, member)
 VALUES ('jtaylor', 'swinburne', 'Jonathon', TRUE);
 
-INSERT INTO User(Username, Password, Name, Member)
+INSERT INTO user(username, password_hash, name, member)
 VALUES ('svambe', 'swinburne', 'Shaun', TRUE);
 
-INSERT INTO User(Username, Password, Name, Member)
+INSERT INTO user(username, password_hash, name, member)
 VALUES ('mhopkins', 'swinburne', 'Morgan', TRUE);
 
-INSERT INTO User(Username, Password_hash, Name, Member)
+INSERT INTO user(username, password_hash, name, member)
 VALUES ('Admin', 'Admin', 'Administrator', FALSE);
 
 -- ABOUT TABLE
