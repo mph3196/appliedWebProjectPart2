@@ -1,14 +1,14 @@
 <?php
+$currentPage = 'jobs'; 
+$pageTitle = 'JSM Jobs Applications Page'; 
+$pageDescription = 'Careers page for JSM website'; 
+$pageHeading = 'Careers - Positions Available'; 
 
-$currentPage = 'jobs'; // Used for navigation highlighting
-$pageTitle = 'JSM Jobs Applications Page'; // Appears in browser
-$pageDescription = 'Careers page for JSM website'; // Meta description
-$pageHeading = 'Careers - Positions Available'; // Main heading displayed on page
+// Include HTML Components 
+include 'header.inc'; 
+include 'nav.inc'; 
 
-include 'header.inc'; // Contains: DOCTYPE, <html>, <head>, opening <body>, page header
-include 'nav.inc'; // Contains: Navigation menu/navbar
-
-// Import database
+// Import Database
 require_once 'settings.php';
 
 // Establish connection to MySQL database
@@ -19,14 +19,11 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-//SQL query to retrieve basic job information from Jobs table
+//SQL query to retrieve basic job information from Jobs table and store result
 $sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id ASC";
-
-// Execute the query and store result
 $result = mysqli_query($conn, $sql);
 ?>
 
-<!-- HTML Aside Section -->
   <aside> 
     <h2>Why Work With Us?</h2>
         <p>At JSM University, we are committed to advancing digital learning and research. 
@@ -61,86 +58,69 @@ $result = mysqli_query($conn, $sql);
         <p><strong>Pro Tip:</strong> Highlight your experience with educational technology and your passion for digital learning in your application!</p>
     </div>
   </aside>
-<!-- End HTML Aside Section -->
+
 <?php
-
-if (mysqli_num_rows($result) > 0) { // Check if the query returned any rows
-    
-    // Main Loop: Iterate through each job record
-    while ($job = mysqli_fetch_assoc($result)) {
-        $refNo = $job['RefNo']; // Foreign key that links to related tables
+    // Main Loop
+while ($job = mysqli_fetch_assoc($result)) {
+    $refNo = $job['RefNo']; 
 ?>
-    <!-- ====================================== -->
-    <!--              Job Section               -->
-    <!-- ====================================== -->
-
+    <!-- Job Section -->
     <section class="jobscontainer"> 
 
     <!-- Job Title Header -->   
     <div class="header"><?php echo $job['Title']; ?></div> 
 
-     <!-- Basic Job Information (from Jobs table) -->
+     <!-- Basic Job Information -->
     <h2>Reference Number: <?php echo $refNo; ?></h2> 
     <p><strong>Salary:</strong> <?php echo $job['Salary']; ?></p> 
     <p><strong>Reports to:</strong> <?php echo $job['ReportsTo']; ?></p> 
     <p><strong>Short Description:</strong> <?php echo $job['ShortDescription']; ?></p> 
 
-    <!-- ============================ -->
-    <!-- Key Responsibilities Section -->
-    <!-- ============================ -->
-
+        <!-- Key Responsibilities -->
         <h3>Key Responsibilities</h3> 
         <ul>
         <?php
-            // Query to fetch all responsibilities for this specific job
+            // Query to fetch all responsibilities for the job
             $sql_resp = "SELECT Description FROM JobResponsibility WHERE RefNo = '$refNo' ORDER BY RespID ASC";
 
-             // Execute responsibility query
+            // Execute responsibility query
             $responsibilities = mysqli_query($conn, $sql_resp);
             
-            // Loop through all responsibility records for this job
+            // Loop through all responsibility records for the job
             while ($resp = mysqli_fetch_assoc($responsibilities)) {
                 echo '<li>' . $resp['Description'] . '</li>';
             }
         ?>
         </ul>
 
-        <!-- ============================== -->
-        <!-- Essential Requirements Section -->
-        <!-- ============================== -->
-
+       <!-- Essential Requirements -->
         <h3>Essential Requirements</h3> 
         <ol> 
         <?php
-            // Query to fetch all essential requirements for this specific job
+            // Query to fetch all essential requirements for the job
             $sql_ess = "SELECT Description FROM JobEssential WHERE RefNo = '$refNo' ORDER BY EssentialID ASC";
 
             // Execute essential requirements query
             $essentials = mysqli_query($conn, $sql_ess);
             
-            // Loop through all essential requirement records for this job
+            // Loop through all essential requirement records for the job
             while ($req = mysqli_fetch_assoc($essentials)) {
                 echo '<li>' . $req['Description'] . '</li>'; 
             }
         ?>
         </ol>
 
-        <!-- =============================== -->
-        <!-- PREFERABLE REQUIREMENTS SECTION -->
-        <!-- =============================== -->
-
+       <!-- Preferable Requirements -->
         <h3>Preferable Requirements</h3> 
         <ul>
         <?php
-            // Query to fetch all preferable requirements for this specific job
+            // Query to fetch all preferable requirements for the job
             $sql_pref = "SELECT Description FROM JobPreferable WHERE RefNo = '$refNo' ORDER BY PreferableID ASC";
 
             // Execute preferable requirements query
             $preferables = mysqli_query($conn, $sql_pref);
-            
-            // Only display the heading/list if there are preferable requirements
-                
-                 // Loop through all preferable requirement records
+                           
+                // Loop through all preferable requirement records for the job
                 while ($pref = mysqli_fetch_assoc($preferables)) {
                     echo '<li>' . $pref['Description'] . '</li>';
                 } 
@@ -151,13 +131,11 @@ if (mysqli_num_rows($result) > 0) { // Check if the query returned any rows
             <a href="apply.php">Apply Now</a>
         </p>
 
-    </section> <!-- End of job card -->
+    </section> <!-- End of jobs -->
 
 <?php
 
     }  // End of while loop 
-
-} // End of if statement 
 
 mysqli_close($conn); // Close Database Connection
 
