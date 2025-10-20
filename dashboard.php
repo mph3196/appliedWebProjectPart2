@@ -19,7 +19,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 // Set identifier from session (assuming 'name' is unique enough to filter)
 $user_identifier = $_SESSION['name']; 
-$filter_column = 'FirstName'; // Placeholder: Change to the correct EOI column (e.g., UserID, Username)
+$filter_column = 'FirstName';
 
 require_once "settings.php";
 
@@ -40,7 +40,6 @@ if (!$dbconn) {
 // Query to fetch current user's EOIs
 $safe_identifier = mysqli_real_escape_string($dbconn, $user_identifier);
 
-// CRITICAL: Ensure 'FirstName' below is the column in your EOI table that links to $_SESSION['name']
 $query = "SELECT RefNo, ApplyDate, FirstName, LastName, Skills, OtherSkills, Status 
           FROM eoi 
           WHERE $filter_column = '$safe_identifier'  
