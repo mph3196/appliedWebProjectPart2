@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // 2. Authorization Check: Must be logged in
-if (!isset($_SESSION['username'])) {
+if (!isset($_SESSION['name'])) {
     header('Location: login.php?error=Please log in to view your dashboard.');
     exit;
 }
@@ -28,7 +28,7 @@ include 'nav.inc';
 ?>
 
 <header style="display:flex; justify-content:space-between; align-items:center; background:#1976d2; color:white; padding:1em;">
-    <h2 style="margin:0;">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></h2>
+    <h2 style="margin:0;">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></h2>
 </header>
 
 <div style="padding: 20px;">

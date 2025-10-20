@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
         
         if (!$login_successful) {
-            $sql_regular = "SELECT id, username, password_hash FROM users1 WHERE username = ?";
+            $sql_regular = "SELECT id, name, username, password_hash FROM users1 WHERE username = ?";
             $stmt = $mysqli->prepare($sql_regular);
             
             if ($stmt) {
@@ -62,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         if ($login_successful) {
+            $_SESSION['name'] = $user_data['name'];
             $_SESSION['user_id'] = $user_data['id'];
             $_SESSION['username'] = $user_data['username'];
             $_SESSION['is_admin'] = $is_admin;
