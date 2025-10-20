@@ -13,14 +13,14 @@ CREATE TABLE Jobs(
     ShortDescription TEXT NOT NULL
 );
 
--- Insert core data into the Jobs table
+-- Insert main data into the Jobs table
 INSERT INTO Jobs(RefNo, Title, Salary, ReportsTo, ShortDescription) VALUES 
 ('G03A1', 'IT Support Officer', '$78,000 – $85,000 per annum', 'Manager, Digital Learning & Research Support', 'Join our IT department to provide frontline support for digital learning platforms and research technologies that enhance teaching, learning, and innovation.'),
 ('G03C3', 'Research Data Analyst', '$88,000 – $95,000 per annum', 'Senior Research IT Coordinator', 'Provide data management, analytics, and visualization support for academic research projects.'),
 ('G03B2', 'Learning Technology Specialist', '$82,000 – $90,000 per annum', 'Manager, Digital Learning & Research Support', 'Support academics in designing and delivering online and blended learning experiences using the university digital platforms.'),
 ('G03D4', 'Systems Administrator', '$92,000 – $105,000 per annum', 'Head of IT Infrastructure', 'Maintain and secure the IT infrastructure supporting digital learning and research systems.');
 
--- 1. Table for Key Responsibilities 
+-- Table for Key Responsibilities 
 CREATE TABLE JobResponsibility (
     RespID INT PRIMARY KEY AUTO_INCREMENT,
     RefNo VARCHAR(5) NOT NULL,
@@ -53,7 +53,7 @@ INSERT INTO JobResponsibility (RefNo, Description) VALUES
 ('G03D4', 'Ensure uptime and security of digital platforms.'),
 ('G03D4', 'Implement system updates, patches, and backups.');
 
--- 2. Table for Essential Requirements 
+-- Table for Essential Requirements 
 CREATE TABLE JobEssential (
     EssentialID INT PRIMARY KEY AUTO_INCREMENT,
     RefNo VARCHAR(5) NOT NULL,
@@ -82,7 +82,7 @@ INSERT INTO JobEssential (RefNo, Description) VALUES
 ('G03D4', 'Bachelor Degree in Information Systems or Computer Science.'),
 ('G03D4', 'Experience with Linux/Windows server administration.');
 
--- 3. Table for Preferable Requirements 
+-- Table for Preferable Requirements 
 CREATE TABLE JobPreferable (
     PreferableID INT PRIMARY KEY AUTO_INCREMENT,
     RefNo VARCHAR(5) NOT NULL,
