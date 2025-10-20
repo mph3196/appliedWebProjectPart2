@@ -126,5 +126,7 @@ include 'nav.inc';
             <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Repeat Password" required>
             
             <button type="submit">Signup</button>
+            
+            <p>Already a member?<a href="register.php">Login</a></p>
         </form>
     </div>
