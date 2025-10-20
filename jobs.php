@@ -16,12 +16,12 @@ $conn = mysqli_connect($host, $user, $password, $database);
 
 // Error handling
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    die("Connection failed: " . mysqli_connect_error()); //terminate the execution of the current PHP script
 }
 
 //SQL query to retrieve basic job information from Jobs table and store result
 $sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id ASC";
-$result = mysqli_query($conn, $sql);
+$result = mysqli_query($conn, $sql); 
 ?>
 
   <aside> 
@@ -61,8 +61,8 @@ $result = mysqli_query($conn, $sql);
 
 <?php
     // Main Loop
-while ($job = mysqli_fetch_assoc($result)) {
-    $refNo = $job['RefNo']; 
+while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associative array.
+    $refNo = $job['RefNo']; //variable used in subsequent queries to fetch related data
 ?>
     <!-- Job Section -->
     <section class="jobscontainer"> 
@@ -87,7 +87,7 @@ while ($job = mysqli_fetch_assoc($result)) {
             $responsibilities = mysqli_query($conn, $sql_resp);
             
             // Loop through all responsibility records for the job
-            while ($resp = mysqli_fetch_assoc($responsibilities)) {
+            while ($resp = mysqli_fetch_assoc($responsibilities)) { //fetches a result row as an associative array.
                 echo '<li>' . $resp['Description'] . '</li>';
             }
         ?>
@@ -104,7 +104,7 @@ while ($job = mysqli_fetch_assoc($result)) {
             $essentials = mysqli_query($conn, $sql_ess);
             
             // Loop through all essential requirement records for the job
-            while ($req = mysqli_fetch_assoc($essentials)) {
+            while ($req = mysqli_fetch_assoc($essentials)) { //fetches a result row as an associative array.
                 echo '<li>' . $req['Description'] . '</li>'; 
             }
         ?>
@@ -121,7 +121,7 @@ while ($job = mysqli_fetch_assoc($result)) {
             $preferables = mysqli_query($conn, $sql_pref);
                            
                 // Loop through all preferable requirement records for the job
-                while ($pref = mysqli_fetch_assoc($preferables)) {
+                while ($pref = mysqli_fetch_assoc($preferables)) { //fetches a result row as an associative array.
                     echo '<li>' . $pref['Description'] . '</li>';
                 } 
         ?>
