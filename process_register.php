@@ -21,9 +21,18 @@ if (!preg_match("/[0-9]/", $_POST['password'])) {
 
 $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-$mysqli = require __DIR__ . '/database.php';
+$mysqli = require __DIR__ . '/settings.php';
 
-$sql = 'INSERT INTO User (name, username, password_hash)
+// Establish connection to MySQL database
+$conn = mysqli_connect($host, $user, $password, $database);
+
+// Error handling
+if (!$conn) {
+    //terminate the execution of the current PHP script
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$sql = 'INSERT INTO Users1 (name, username, password_hash)
         VALUES (?, ?, ?)';
 
 $stmt = $mysqli->stmt_init();
