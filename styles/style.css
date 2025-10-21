@@ -432,6 +432,17 @@ END of About Page styles (about.html)
     
 */
 
+.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
 * {
   box-sizing: border-box;
 }

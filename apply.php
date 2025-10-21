@@ -24,11 +24,15 @@ include 'nav.inc';
 
 <div class="form-container">
   <h2>Job Application Form</h2>
-  <form id="jobApplicationForm" action="https://mercury.swin.edu.au/it000000/formtest.php" method="post">
+  <form id="jobApplicationForm" action="https://mercury.swin.edu.au/it000000/formtest.php" method="POST">
+    <?php
+            if (isset($_GET['error'])) { ?>
+              <p class='error'><?php echo htmlspecialchars($_GET['error']); ?></p>
+            <?php } ?>
 <!-- Job Reference Number -->
         <div class="form-group">
-          <label for="jobRef">Job Reference Number <span class="required">*</span></label>
-          <input type="text" id="jobRef" name="jobRef" required pattern="[A-Za-z0-9]{5}"
+          <label for="refNo">Job Reference Number <span class="required">*</span></label>
+          <input type="text" id="refNo" name="refNo" pattern="[A-Za-z0-9]{5}"
           title="Enter your 5 character Job Reference Number" minlength="5" maxlength="5">
         </div>
         
@@ -38,22 +42,19 @@ include 'nav.inc';
           <div class="two-column">
             <div class="form-group">
               <label for="firstName">First Name <span class="required">*</span></label>
-              <input type="text" id="firstName" name="firstName" required pattern="[A-Za-z]{1, 20}"
-              title="Enter your first name, maximum 20 letters" maxlength="20">
+              <input type="text" id="firstName" name="firstName" title="Enter your first name, maximum 20 letters">
             </div>
             
             <div class="form-group">
               <label for="lastName">Last Name <span class="required">*</span></label>
-              <input type="text" id="lastName" name="lastName" required pattern="[A-Za-z]{1, 20}"
-              title="Enter your last name, maximum 20 characters" maxlength="20">
+              <input type="text" id="lastName" name="lastName" title="Enter your last name, maximum 20 characters">
             </div>
           </div>
           
           <!-- Date of Birth -->
           <div class="form-group">
             <label for="dob">Date of Birth <span class="required">*</span></label>
-            <input type="text" id="dob" name="dob" required placeholder="dd/mm/yyyy"
-            pattern="^\d{2}/\d{2}/\d{4}$" title="Enter your date of birth in dd/mm/yyyy format">
+            <input type="text" id="dob" name="dob" placeholder="dd/mm/yyyy" title="Enter your date of birth in dd/mm/yyyy format">
           </div>
         </fieldset>
         
@@ -62,7 +63,7 @@ include 'nav.inc';
           <legend>Gender <span class="required">*</span></legend>
           <div class="radio-group">
             <label class="radio-container">
-              <input type="radio" id="male" name="gender" value="male" required>
+              <input type="radio" id="male" name="gender" value="male">
               Male
               <span class="radio-button"></span>
             </label>
