@@ -38,11 +38,11 @@ if (!$dbconn) {
 }
 
 // Query to fetch current user's EOIs
-$safe_identifier = mysqli_real_escape_string($dbconn, $user_identifier);
+$user_id = $_SESSION['user_id'];
 
 $query = "SELECT RefNo, ApplyDate, FirstName, LastName, Skills, OtherSkills, Status 
           FROM eoi 
-          WHERE $filter_column = '$safe_identifier'  
+          WHERE ID = $user_id
           ORDER BY ApplyDate DESC";
           
 $result = mysqli_query($dbconn, $query);

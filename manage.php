@@ -3,18 +3,12 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['name'])) {
+// Check if admin is logged in
+if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'Admin') {
     header('Location: login.php?error=Access denied. Administrator privileges required.');
     exit;
 }
-// Check if the user is logged in
-if (!isset($_SESSION['adminlogged_in']) || $_SESSION['adminlogged_in'] !== true) {
-    // If not logged in, destroy any existing session data and redirect to login
-    session_unset();
-    session_destroy();
-    header('Location: login.php?error=Access denied. Administrator privileges required.');
-    exit;
-}
+
 $currentPage = 'manage';
 $pageTitle = 'JSM Manage Page';
 $pageDescription = 'Manage page for JSM website';
@@ -44,7 +38,7 @@ if (!$result) {
 }
 if ($result && mysqli_num_rows($result) > 0) {
         echo "<table border='1' cellpadding='5'>";
-        echo "<tr><th>RefNo</th><th>ID</th><th>ApplyDate</th><th>FirstName</th><th>LastName</th><th>DOB</th><th>Gender</th><th>Address</th><th>Suburb</th><th>Email</th><th>PhoneNo</th><th>Skills</th><th>Suburb</th><th>OtherSkills</th><th>Status</th></tr>";
+        echo "<tr><th>RefNo</th><th>ID</th><th>ApplyDate</th><th>FirstName</th><th>LastName</th><th>DOB</th><th>Gender</th><th>Address</th><th>Suburb</th><th>Email</th><th>PhoneNo</th><th>Skills</th><th>OtherSkills</th><th>Status</th></tr>";
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<tr>";
             echo "<td>" . $row['RefNo'] . "</td>";
@@ -59,14 +53,13 @@ if ($result && mysqli_num_rows($result) > 0) {
             echo "<td>" . $row['Email'] . "</td>";
             echo "<td>" . $row['PhoneNo'] . "</td>";
             echo "<td>" . $row['Skills'] . "</td>";
-            echo "<td>" . $row['Suburb'] . "</td>";
             echo "<td>" . $row['OtherSkills'] . "</td>";
             echo "<td>" . $row['Status'] . "</td>";
             echo "</tr>";
         }
     echo "</table>";
 } else {
-    echo "<p>There are no cars to display.</p>";
+    echo "<p>There are no EOIs to display.</p>";
 }
 if ($result) {
     mysqli_free_result($result);
