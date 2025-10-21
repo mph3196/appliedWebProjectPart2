@@ -30,7 +30,7 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$sql = 'INSERT INTO Users1 (name, username, password_hash)
+$sql = 'INSERT INTO User (name, username, password_hash)
         VALUES (?, ?, ?)';
 
 $stmt = $conn->stmt_init();
