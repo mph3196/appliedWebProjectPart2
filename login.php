@@ -11,7 +11,7 @@ $pageHeading = 'Login';
 include 'header.inc';
 include 'nav.inc';
 
-// 2. Database connection
+// Database connection
 require_once "settings.php";
 $dbconn = mysqli_connect($host, $user, $password, $database); 
 
@@ -19,7 +19,7 @@ if (!$dbconn) {
     $db_error = "Unable to connect to the database.";
 }
 
-// Handle login attempt (Consolidated and Cleaned Logic)
+// Handle login attempt
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (isset($db_error)) {
@@ -31,49 +31,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password_input = $_POST['password'];
     $safe_username = mysqli_real_escape_string($dbconn, $username);
 
-
-    //Regular User Login
-    $sql = sprintf("SELECT id, name, password_hash FROM users1 WHERE username = '%s'", $safe_username);
+    // Single query - check User table only
+    $sql = sprintf("SELECT id, name, password_hash FROM User WHERE username = '%s'", $safe_username);
     $result = mysqli_query($dbconn, $sql);
     $user_data = $result ? $result->fetch_assoc() : null;
 
     if ($user_data && password_verify($password_input, $user_data['password_hash'])) {
-        // Successful regular User Login
+        // Successful login
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['name'] = $user_data['name'];
         $_SESSION['user_id'] = $user_data['id']; 
-           
-        header('Location: dashboard.php'); // Redirect standard user to dashboard page
+        
+        // Check if admin and set flag
+        if ($username === 'Admin') {
+            $_SESSION['is_admin'] = true;
+            header('Location: manage.php');
+        } else {
+            header('Location: dashboard.php');
+        }
         exit;
     }
 
-    $sql = sprintf("SELECT id, name, password_hash FROM user WHERE username = '%s'", $safe_username);
-    $result = mysqli_query($dbconn, $sql);
-    $admin_data = $result ? $result->fetch_assoc() : null;
-
-    if ($admin_data && password_verify($password_input, $admin_data['password_hash'])) {
-        // Successful Admin User Login
-        $_SESSION['adminlogged_in'] = true;
-        $_SESSION['is_admin'] = true;
-        $_SESSION['username'] = $username;
-        $_SESSION['name'] = $admin_data['name'];
-        $_SESSION['user_id'] = $admin_data['id'];
-        header('Location: manage.php'); // Redirect admin to the management page
-        exit;
-    }
-
-    //both login attempts failed.
+    // Login failed
     header('Location: login.php?error=Invalid username or password.');
     exit;
 }
 
-// Close connection if it was successfully opened
-if (isset($dbconn) && $dbconn) {
-    $dbconn->close();
-}
 ?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $pageTitle; ?></title>
     <style>
         * {
             font-family: Arial, sans-serif;
@@ -171,7 +162,7 @@ if (isset($dbconn) && $dbconn) {
     <div class="main-content-area">
         <h2><?php echo $pageHeading; ?></h2>
         <?php if (isset($db_error)) { ?>
-            <!-- Display database connection error if it occurred.-->
+            <!-- Display database connection error if it occurred -->
             <p class="error"><?php echo htmlspecialchars($db_error); ?></p>
         <?php } ?>
         <form method="post">
@@ -188,7 +179,12 @@ if (isset($dbconn) && $dbconn) {
             
             <button type="submit">Login</button>
 
-            <p>New Here?<a href="register.php">Sign Up</a></p>
+            <p>New Here? <a href="register.php">Sign Up</a></p>
         </form>
     </div>
-<?php include 'footer.inc'; ?>
+<?php
+mysqli_close($dbconn);
+include 'footer.inc';
+?>
+</body>
+</html>
