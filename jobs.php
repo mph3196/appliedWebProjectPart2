@@ -20,7 +20,7 @@ if (!$conn) {
 }
 
 //SQL query to retrieve basic job information from Jobs table and store result
-$sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id ASC";
+$sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id"; //https://www.w3schools.com/sql/sql_orderby.asp
 $result = mysqli_query($conn, $sql); 
 ?>
 
@@ -61,7 +61,7 @@ $result = mysqli_query($conn, $sql);
 
 <?php
     // Main Loop
-while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associative array.
+while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative array.
     $refNo = $job['RefNo']; //variable used in subsequent queries to fetch related data
 ?>
     <!-- Job Section -->
@@ -81,7 +81,7 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associ
         <ul>
         <?php
             // Query to fetch all responsibilities for the job
-            $sql_resp = "SELECT Description FROM JobResponsibility WHERE RefNo = '$refNo' ORDER BY RespID ASC";
+            $sql_resp = "SELECT Description FROM JobResponsibility WHERE RefNo = '$refNo' ORDER BY RespID"; //https://www.w3schools.com/sql/sql_orderby.asp
 
             // Execute responsibility query
             $responsibilities = mysqli_query($conn, $sql_resp);
@@ -98,7 +98,7 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associ
         <ol> 
         <?php
             // Query to fetch all essential requirements for the job
-            $sql_ess = "SELECT Description FROM JobEssential WHERE RefNo = '$refNo' ORDER BY EssentialID ASC";
+            $sql_ess = "SELECT Description FROM JobEssential WHERE RefNo = '$refNo' ORDER BY EssentialID"; //https://www.w3schools.com/sql/sql_orderby.asp
 
             // Execute essential requirements query
             $essentials = mysqli_query($conn, $sql_ess);
@@ -115,7 +115,7 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associ
         <ul>
         <?php
             // Query to fetch all preferable requirements for the job
-            $sql_pref = "SELECT Description FROM JobPreferable WHERE RefNo = '$refNo' ORDER BY PreferableID ASC";
+            $sql_pref = "SELECT Description FROM JobPreferable WHERE RefNo = '$refNo' ORDER BY PreferableID"; //https://www.w3schools.com/sql/sql_orderby.asp
 
             // Execute preferable requirements query
             $preferables = mysqli_query($conn, $sql_pref);
