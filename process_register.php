@@ -21,15 +21,21 @@ if (!preg_match("/[0-9]/", $_POST['password'])) {
 
 $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-$mysqli = require __DIR__ . '/database.php';
+require 'settings.php';
+// Establish connection to MySQL database
+$conn = mysqli_connect($host, $user, $password, $database);
+// Error handling
+if (!$conn) {
+    //terminate the execution of the current PHP script
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-$sql = 'INSERT INTO User (name, username, password_hash)
+$sql = 'INSERT INTO Users1 (name, username, password_hash)
         VALUES (?, ?, ?)';
 
-$stmt = $mysqli->stmt_init();
-
+$stmt = $conn->stmt_init();
 if (! $stmt->prepare($sql)) {
-    die("SQL prepare error: ". $mysqli->error);
+    die("SQL prepare error: ". $conn->error);
 }
 
 $stmt->bind_param("sss",
@@ -38,14 +44,16 @@ $stmt->bind_param("sss",
                   $password_hash);
 
 if ($stmt->execute()) {
-    header('Location: dashboard.php'); 
+    header('Location: login.php'); 
     exit;
+
 } else {
-    if ($mysqli->errno === 1062) {
+    if ($conn->errno === 1062) {
         header('Location: register.php?error=Username already taken');
         exit;
+
     } else {
-        die("Database execute error: " . $mysqli->error . " (Error Code: " . $mysqli->errno . ")");
+        die("Database execute error: " . $conn->error . " (Error Code: " . $conn->errno . ")");
     }
 }
 ?>

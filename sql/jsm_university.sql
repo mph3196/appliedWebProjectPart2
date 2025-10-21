@@ -286,6 +286,26 @@ INSERT INTO `user` (`id`, `username`, `password_hash`, `name`, `member`) VALUES
 (3, 'mhopkins', '$2y$10$j8kxqiEo0iQZT5QcwgIY0eRef.D7j29OorAcwewX4hCQufcLr/06m', 'Morgan', NULL),
 (5, 'Admin', '$2y$10$veJddWdhghRjSOkaEVZ7quqHxV4kq8UcI5NVNsVB1DS91Xe23m0xG', 'Administrator', NULL);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users1`
+--
+
+CREATE TABLE `users1` (
+  `id` int(11) NOT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `username` varchar(128) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users1`
+--
+
+INSERT INTO `users1` (`id`, `name`, `username`, `password_hash`) VALUES
+('?', '?', '?', '?');
+
 --
 -- Indexes for dumped tables
 --
@@ -365,6 +385,13 @@ ALTER TABLE `role`
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indexes for table `users1`
+--
+ALTER TABLE `users1`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
 

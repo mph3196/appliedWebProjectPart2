@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     //Regular User Login
-    $sql = sprintf("SELECT id, name, password_hash FROM User WHERE username = '%s'", $safe_username);
+    $sql = sprintf("SELECT id, name, password_hash FROM users1 WHERE username = '%s'", $safe_username);
     $result = mysqli_query($dbconn, $sql);
     $user_data = $result ? $result->fetch_assoc() : null;
 
@@ -181,8 +181,7 @@ if (isset($dbconn) && $dbconn) {
             <?php } ?>
 
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Username" required
-                   value="<?= htmlspecialchars($username_value) ?>">
+            <input type="text" id="username" name="username" placeholder="Username" required>
             
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Password" required>
