@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS EOI;
+DROP TABLE IF EXISTS Member;
+DROP TABLE IF EXISTS User;
+
 -- JOBS TABLE 
 DROP TABLE IF EXISTS JobPreferable;
 DROP TABLE IF EXISTS JobEssential;
@@ -119,9 +123,9 @@ DROP TABLE IF EXISTS User;
 CREATE TABLE User (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(128) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(128),
-    member BOOLEAN,
+    member BOOLEAN
 );
 
 INSERT INTO user(username, password_hash, name, member)
@@ -168,14 +172,14 @@ CREATE TABLE EOI(
     OtherSkills VARCHAR(1024),
     Status ENUM('New', 'Current', 'Final') DEFAULT 'New',
     FOREIGN KEY (RefNo) REFERENCES Jobs(RefNo) ON DELETE CASCADE,
-    FOREIGN KEY (ID) REFERENCES Users1(ID) ON DELETE CASCADE,
+    FOREIGN KEY (ID) REFERENCES User(ID) ON DELETE CASCADE,
     UNIQUE(ID, RefNo),
     CONSTRAINT chk_postcode CHECK (Postcode BETWEEN 0 AND 9999)
 );
 
 INSERT INTO EOI(RefNo, ID, FirstName, LastName, DOB, Gender, Address,
     Suburb, Postcode, State, Email, PhoneNo, Skills, OtherSkills)
-VALUES ('ab123', 1, 'Slim', 'Shady', CURDATE(), 'M', '8 Mile', 
+VALUES ('G03A1', 1, 'Slim', 'Shady', CURDATE(), 'M', '8 Mile', 
     'Compton', 3196, 'VIC', 'slim@shady.com', '0418696969', 'Listening', 'Rapping about yo mama');
 
 -- MEMBER TABLE
