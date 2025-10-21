@@ -1,5 +1,8 @@
 <?php
 session_start();
+$userId = $_SESSION['user_id'];
+require_once 'settings.php';
+
 
 // Sanitise script courtesy of Atie Kia (https://github.com/atieasadikia/COS10026-S2-2025/blob/main/lecture07/form.php)
 function sanitise_input($data){
@@ -174,6 +177,63 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         exit;
     }
 
-    exit;
+
+    // Connect to database
+    $conn = mysqli_connect($host, $user, $password, $database);
+    if (!$conn) {
+        die("Connectfion failed: " . mysqli_connect_error());
+    }
+
+    // Convert skills array to a string
+    $skills_string = '';
+    $skills_count = count($skills);
+
+    for ($i = 0; $i < $skills_count; $i++) {
+        if ($i > 0) {
+            $skills_string .= ', ';
+        }
+        $skills_string .= $skills[$i];
+    }
+
+    // Escape all string variables for SQL safety
+    $refNo = mysqli_real_escape_string($conn, $refNo);
+    $firstName = mysqli_real_escape_string($conn, $firstName);
+    $lastName = mysqli_real_escape_string($conn, $lastName);
+    $gender = mysqli_real_escape_string($conn, $gender);
+    $address = mysqli_real_escape_string($conn, $address);
+    $suburb = mysqli_real_escape_string($conn, $suburb);
+    $state = mysqli_real_escape_string($conn, $state);
+    $email = mysqli_real_escape_string($conn, $email);
+    $phone = mysqli_real_escape_string($conn, $phone);
+    $skills_string = mysqli_real_escape_string($conn, $skills_string);
+    $otherSkills = mysqli_real_escape_string($conn, $otherSkills);
+    // Convert postcode to integer
+    $postcode = (int)$postcode;
+    // Convert date to sql date format
+    $dob = date('Y-m-d', strtotime($_POST['dob']));
+
+    $sql = "INSERT INTO eoi(RefNo, ID, FirstName, LastName, DOB, Gender, Address, 
+        Suburb, Postcode, State, Email, PhoneNo, Skills, OtherSkills, Status) 
+        VALUES ('$refNo', $userId, '$firstName', '$lastName', '$dob', '$gender', 
+        '$address', '$suburb', $postcode, '$state', '$email', '$phone', '$skills_string', '$otherSkills', 'New')";
+
+    // Execute the query
+    if (mysqli_query($conn, $sql)) {
+        // If successful, clear session and redirect
+        $_SESSION['form_data'] = array();
+        $_SESSION['error'] = '';
+        header('Location: dashboard.php');
+        exit;
+    } else {
+        // Database error
+        $_SESSION['error'] = 'Unable to process your application. Please try again.';
+    }
+
+    mysqli_close($conn);
+
+
+    $_SESSION['form_data'] = array();
+    $_SESSION['error'] = '';
+
 }
 ?>

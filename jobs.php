@@ -128,7 +128,7 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associ
         </ul>
 
         <p class="apply-button"> <!-- Apply Button -->
-            <a href="apply.php">Apply Now</a>
+            <a href="apply.php?refNo=<?php echo $refNo; ?>">Apply Now</a>
         </p>
 
     </section> <!-- End of jobs -->
