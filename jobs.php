@@ -8,16 +8,15 @@ $pageHeading = 'Careers - Positions Available';
 include 'header.inc';
 include 'nav.inc';
 
-require_once 'settings.php'; // Connect to database
-$conn = new mysqli($host, $user, $password, $database); // Create connection
-$sql = "SELECT * FROM jobs ORDER BY id ASC";// Fetch all jobs from database
-$result = $conn->query($sql);
-$jobs = [];// Store jobs in array
-if ($result && $result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $jobs[] = $row;
-    }
+require_once 'settings.php';
+$conn = mysqli_connect($host, $user, $password, $database);
+
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
+
+$sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id ASC";
+$result = mysqli_query($conn, $sql);
 ?>
 
   <aside> <!--Required aside -->
@@ -55,152 +54,71 @@ if ($result && $result->num_rows > 0) {
     </div>
   </aside>
 
-<!-- =============================-->
-<!-- Below lists 4 'applications', each structured within a section jobscontainer class. The reference number is within a header class and the apply button within the apply-button class -->
-<!-- All information regarding JSM University content within the jobs container credited to The Claude AI LLM: https://claude.ai/new -->
-<!-- Requirements state "one ordered list, one unordered list" - Assumed this meant per section / jobs container application -->
-<!-- =============================-->
+<?php
 
-  <!-- Application 1 -->
-  <section class="jobscontainer"> <!-- Section -->
-    <div class="header">IT Support Officer</div> <!-- Title --> <!-- Heading of one level -->
-    <h2>Reference Number: G03A1</h2> <!-- Reference number (5 alphanumeric) -->
+if (mysqli_num_rows($result) > 0) {
+    // Loop through each job record
+    while ($job = mysqli_fetch_assoc($result)) {
+        $refNo = $job['RefNo'];
+?>
 
-    <p><strong>Salary:</strong> $78,000 – $85,000 per annum</p>  <!-- Salary -->
-    <p><strong>Reports to:</strong> Manager, Digital Learning & Research Support</p>  <!-- Reporting Line -->
-    <p><strong>Short Description:</strong> Join our IT department to provide  <!-- Short Description -->
-      frontline support for digital learning platforms and research technologies 
-      that enhance teaching, learning, and innovation.
-    </p>
+    <section class="jobscontainer"> <div class="header"><?php echo $job['Title']; ?></div> <h2>Reference Number: <?php echo $refNo; ?></h2> <p><strong>Salary:</strong> <?php echo $job['Salary']; ?></p> 
+        <p><strong>Reports to:</strong> <?php echo $job['ReportsTo']; ?></p> 
+        <p><strong>Short Description:</strong> <?php echo $job['ShortDescription']; ?></p> 
 
-    <h3>Key Responsibilities</h3> <!-- Key Responsibilities --> <!-- Heading of another level -->
-    <ul> <!-- Unordered list. -->
-      <li>Provide technical support for digital learning platforms (LMS, collaboration tools).</li>
-      <li>Assist researchers with software, data storage, and secure computing resources.</li>
-      <li>Maintain system documentation and user guides.</li>
-      <li>Ensure accessibility and compliance with IT security policies.</li>
-    </ul>
+        <h3>Key Responsibilities</h3> 
+        <ul>
+        <?php
+            // Display Key Responsibilities
+            $sql_resp = "SELECT Description FROM JobResponsibility WHERE RefNo = '$refNo' ORDER BY RespID ASC";
+            $responsibilities = mysqli_query($conn, $sql_resp);
+            
+            while ($resp = mysqli_fetch_assoc($responsibilities)) {
+                echo '<li>' . $resp['Description'] . '</li>';
+            }
+        ?>
+        </ul>
 
-    <h3>Essential Requirements</h3> <!-- Essential Requirements -->
-    <ol> <!-- Ordered list, -->
-      <li>Bachelor’s degree in Information Technology or related field.</li>
-      <li>Experience supporting digital learning or research systems.</li>
-      <li>Strong communication and problem-solving skills.</li>
-    </ol>
+        <h3>Essential Requirements</h3> 
+        <ol> 
+        <?php
+            // Display Essential Requirements
+            $sql_ess = "SELECT Description FROM JobEssential WHERE RefNo = '$refNo' ORDER BY EssentialID ASC";
+            $essentials = mysqli_query($conn, $sql_ess);
+            
+            while ($req = mysqli_fetch_assoc($essentials)) {
+                echo '<li>' . $req['Description'] . '</li>';
+            }
+        ?>
+        </ol>
 
-    <h3>Preferable Requirements</h3> <!-- Preferable Requirements -->
-    <ul>
-      <li>Knowledge of accessibility standards in digital education.</li>
-      <li>Experience with cloud-based platforms (e.g., Microsoft Azure, AWS).</li>
-      <li>Familiarity with research data management practices.</li>
-    </ul>
+        <?php
+            // Display Preferable Requirements
+            $sql_pref = "SELECT Description FROM JobPreferable WHERE RefNo = '$refNo' ORDER BY PreferableID ASC";
+            $preferables = mysqli_query($conn, $sql_pref);
+            
+            // Only display the heading/list if there are preferable requirements
+            if (mysqli_num_rows($preferables) > 0) {
+                echo '<h3>Preferable Requirements</h3>';
+                echo '<ul>';
+                while ($pref = mysqli_fetch_assoc($preferables)) {
+                    echo '<li>' . $pref['Description'] . '</li>';
+                }
+                echo '</ul>';
+            }
+        ?>
 
-    <p class="apply-button">
-      <a href="apply.html">Apply Now</a>
-    </p>
-  </section>
-  <!-- End of Application 1 -->
+        <p class="apply-button">
+            <a href="apply.php">Apply Now</a>
+        </p>
+    </section>
 
-  <!-- Application 2 -->
-  <section class="jobscontainer">  <!-- Section -->
-    <div class="header">Research Data Analyst</div> <!-- Title --> <!-- Heading of one level -->
-    <h2>Reference Number: G03C3</h2> <!-- Reference number (5 alphanumeric) -->
+<?php
+    } 
+} 
 
-    <p><strong>Salary:</strong> $88,000 – $95,000 per annum</p> <!-- Salary -->
-    <p><strong>Reports to:</strong> Senior Research IT Coordinator</p> <!-- Reporting Line -->
-    <p><strong>Short Description:</strong> Provide data management, analytics, and visualization support for academic research projects.</p> <!-- Short Description -->
- 
-    <h3>Key Responsibilities</h3> <!-- Key Responsibilities --> <!-- Heading of another level -->
-    <ul> <!-- Unordered list. -->
-      <li>Support researchers with secure data storage solutions.</li>
-      <li>Assist in statistical analysis and visualization.</li>
-      <li>Ensure compliance with data security and ethics requirements.</li>
-    </ul>
+// Close the database connection
+mysqli_close($conn);
 
-    <h3>Essential Requirements</h3>  <!-- Essential Requirements -->
-    <ol> <!-- Ordered list, -->
-      <li>Bachelor’s Degree in Data Science, Statistics, or IT.</li>
-      <li>Experience with R, Python, or SPSS.</li>
-    </ol>
-
-    <h3>Preferable Requirements</h3> <!-- Preferable Requirements -->
-    <ul>
-      <li>Knowledge of big data tools (Hadoop, Spark).</li>
-      <li>Experience in higher education research projects.</li>
-    </ul>
-
-    <p class="apply-button">
-      <a href="apply.html">Apply Now</a>
-    </p>
-  </section>
-  <!-- End of Application 2 -->
-
-  <!-- Application 3 -->
-  <section class="jobscontainer"> <!-- Section -->
-    <div class="header">Learning Technology Specialist</div><!-- Title --> <!-- Heading of one level --> 
-    <h2>Reference Number: G03B2</h2> <!-- Reference number (5 alphanumeric) -->
-
-    <p><strong>Salary:</strong> $82,000 – $90,000 per annum</p>  <!-- Salary -->
-    <p><strong>Reports to:</strong> Manager, Digital Learning & Research Support</p> <!-- Reporting Line -->
-    <p><strong>Short Description:</strong> Support academics in designing and delivering online and blended learning experiences using the university’s digital platforms.</p> <!-- Short Description -->
-
-    <h3>Key Responsibilities</h3> <!-- Key Responsibilities --> <!-- Heading of another level -->
-    <ul> <!-- Unordered list. -->
-      <li>Train staff in effective use of the Learning Management System (LMS).</li>
-      <li>Collaborate on course design to ensure accessibility and engagement.</li>
-      <li>Evaluate and recommend new learning technologies.</li>
-    </ul>
-
-    <h3>Essential Requirements</h3> <!-- Essential Requirements -->
-    <ol> <!-- Ordered list, -->
-      <li>Bachelor’s in Education Technology, IT, or similar.</li>
-      <li>Experience with LMS platforms (e.g., Canvas, Blackboard).</li>
-    </ol>
-
-    <h3>Preferable Requirements</h3> <!-- Preferable Requirements -->
-    <ul>
-      <li>Knowledge of instructional design frameworks.</li>
-      <li>Familiarity with accessibility standards (WCAG).</li>
-    </ul>
-
-    <p class="apply-button">
-      <a href="apply.html">Apply Now</a>
-    </p>
-  </section>
-  <!-- End of Application 3 -->
-
-  <!-- Application 4 -->
-  <section class="jobscontainer"> <!-- Section -->
-    <div class="header">Systems Administrator</div> <!-- Title --> <!-- Heading of one level -->
-    <h2>Reference Number: G03D4</h2> <!-- Reference number (5 alphanumeric) -->
-
-    <p><strong>Salary:</strong> $92,000 – $105,000 per annum</p> <!-- Salary -->
-    <p><strong>Reports to:</strong> Head of IT Infrastructure</p>  <!-- Reporting Line -->
-    <p><strong>Short Description:</strong> Maintain and secure the IT infrastructure supporting digital learning and research systems.</p> <!-- Short Description -->
-
-    <h3>Key Responsibilities</h3> <!-- Key Responsibilities --> <!-- Heading of another level -->
-    <ul> <!-- Unordered list. -->
-      <li>Manage servers, networks, and cloud environments.</li>
-      <li>Ensure uptime and security of digital platforms.</li>
-      <li>Implement system updates, patches, and backups.</li>
-    </ul>
-
-    <h3>Essential Requirements</h3> <!-- Essential Requirements -->
-    <ol> <!-- Ordered list, -->
-      <li>Bachelor’s Degree in Information Systems or Computer Science.</li>
-      <li>Experience with Linux/Windows server administration.</li>
-    </ol>
-
-    <h3>Preferable Requirements</h3>  <!-- Preferable Requirements -->
-    <ul>
-      <li>Knowledge of Cybersecurity frameworks.</li>
-      <li>Cloud certification (Azure, AWS, or GCP).</li>
-    </ul>
-
-    <p class="apply-button">
-      <a href="apply.html">Apply Now</a>
-    </p>
-  </section>
-  <!-- End of Application 4 -->
-
-<?php include 'footer.inc'; ?>
+include 'footer.inc';
+?>

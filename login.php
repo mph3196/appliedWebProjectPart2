@@ -1,10 +1,84 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once "settings.php";
 
 $currentPage = 'Login';
 $pageTitle = 'JSM Login Page';
 $pageDescription = 'Login page for JSM website';
-$pageHeading = 'Login - HR Manager';
+$pageHeading = 'Login';
+
+$is_invalid = false;
+$username_value = "";
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    
+    $username_value = $_POST['username'] ?? "";
+    
+    if (empty($_POST['username']) || empty($_POST['password'])) {
+        $is_invalid = true;
+    } else {
+        
+        $mysqli = require __DIR__ . '/database.php';
+        
+        $login_successful = false;
+        $user_data = null;
+        $is_admin = false;
+
+        $sql_admin = "SELECT id, username, password_hash FROM user WHERE username = ?";
+        $stmt = $mysqli->prepare($sql_admin);
+        
+        if ($stmt) {
+            $stmt->bind_param("s", $username_value);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $potential_admin = $result->fetch_assoc();
+            
+            if ($potential_admin && password_verify($_POST['password'], $potential_admin['password_hash'])) {
+                $login_successful = true;
+                $is_admin = true;
+                $user_data = $potential_admin;
+            }
+        }
+        
+        if (!$login_successful) {
+            $sql_regular = "SELECT id, name, username, password_hash FROM users1 WHERE username = ?";
+            $stmt = $mysqli->prepare($sql_regular);
+            
+            if ($stmt) {
+                $stmt->bind_param("s", $username_value);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $potential_user = $result->fetch_assoc();
+                
+                if ($potential_user && password_verify($_POST['password'], $potential_user['password_hash'])) {
+                    $login_successful = true;
+                    $is_admin = false;
+                    $user_data = $potential_user;
+                }
+            }
+        }
+
+        if ($login_successful) {
+            $_SESSION['name'] = $user_data['name'];
+            $_SESSION['user_id'] = $user_data['id'];
+            $_SESSION['username'] = $user_data['username'];
+            $_SESSION['is_admin'] = $is_admin;
+            
+            if ($is_admin) {
+                header('Location: manage.php');
+            } else {
+                header('Location: dashboard.php');
+            }
+            exit;
+        } else {
+            $is_invalid = true;
+        }
+    }
+}
+
 include 'header.inc';
 include 'nav.inc';
 ?>
@@ -105,16 +179,24 @@ include 'nav.inc';
 </head>
 <body>
     <div class="main-content-area">
-        <h2><?php echo $currentPage; ?></h2> 
+        <h2><?php echo htmlspecialchars($currentPage); ?></h2> 
         
-        <form action="process_login.php" method="post"> 
+        <form method="post"> 
             <?php
             if (isset($_GET['error'])) { ?>
-                <p class='error'><?php echo $_GET['error']; ?></p>
+                <p class='error'><?php echo htmlspecialchars($_GET['error']); ?></p>
+            <?php 
+            } elseif ($is_invalid) { ?>
+                <p class='error'>Invalid username or password</p>
             <?php } ?>
 
             <label for="username">Username</label>
+<<<<<<< HEAD
             <input type="text" id="username" name="username" placeholder="Username">
+=======
+            <input type="text" id="username" name="username" placeholder="Username" required
+                   value="<?= htmlspecialchars($username_value) ?>">
+>>>>>>> 68dc185977e386d18ef9e6c38c12d5002499a88e
             
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Password">
