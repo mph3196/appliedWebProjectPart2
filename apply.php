@@ -1,4 +1,13 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['user_id'])) {
+    // If the user is not logged in, redirected to the login page
+    header('Location: login.php?error=You must log in to submit an application.');
+    exit;
+}
+$userId = $_SESSION['user_id'];
 $currentPage = 'apply';
 $pageTitle = 'JSM University Job Applications';
 $pageDescription = 'Applications page for JSM University';

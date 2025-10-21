@@ -3,86 +3,76 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once "settings.php";
-
 $currentPage = 'Login';
 $pageTitle = 'JSM Login Page';
 $pageDescription = 'Login page for JSM website';
 $pageHeading = 'Login';
 
-$is_invalid = false;
-$username_value = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    
-    $username_value = $_POST['username'] ?? "";
-    
-    if (empty($_POST['username']) || empty($_POST['password'])) {
-        $is_invalid = true;
-    } else {
-        
-        $mysqli = require __DIR__ . '/database.php';
-        
-        $login_successful = false;
-        $user_data = null;
-        $is_admin = false;
-
-        $sql_admin = "SELECT id, username, password_hash FROM user WHERE username = ?";
-        $stmt = $mysqli->prepare($sql_admin);
-        
-        if ($stmt) {
-            $stmt->bind_param("s", $username_value);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $potential_admin = $result->fetch_assoc();
-            
-            if ($potential_admin && password_verify($_POST['password'], $potential_admin['password_hash'])) {
-                $login_successful = true;
-                $is_admin = true;
-                $user_data = $potential_admin;
-            }
-        }
-        
-        if (!$login_successful) {
-            $sql_regular = "SELECT id, name, username, password_hash FROM users1 WHERE username = ?";
-            $stmt = $mysqli->prepare($sql_regular);
-            
-            if ($stmt) {
-                $stmt->bind_param("s", $username_value);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $potential_user = $result->fetch_assoc();
-                
-                if ($potential_user && password_verify($_POST['password'], $potential_user['password_hash'])) {
-                    $login_successful = true;
-                    $is_admin = false;
-                    $user_data = $potential_user;
-                }
-            }
-        }
-
-        if ($login_successful) {
-            $_SESSION['name'] = $user_data['name'];
-            $_SESSION['user_id'] = $user_data['id'];
-            $_SESSION['username'] = $user_data['username'];
-            $_SESSION['is_admin'] = $is_admin;
-            
-            if ($is_admin) {
-                header('Location: manage.php');
-            } else {
-                header('Location: dashboard.php');
-            }
-            exit;
-        } else {
-            $is_invalid = true;
-        }
-    }
-}
-
 include 'header.inc';
 include 'nav.inc';
-?>
 
+// 2. Database connection
+require_once "settings.php";
+$dbconn = mysqli_connect($host, $user, $password, $database); 
+
+if (!$dbconn) {
+    $db_error = "Unable to connect to the database.";
+}
+
+// Handle login attempt (Consolidated and Cleaned Logic)
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    if (isset($db_error)) {
+        header('Location: login.php?error=Database connection error. Please try again later.');
+        exit;
+    }
+    
+    $username = trim($_POST['username']);
+    $password_input = $_POST['password'];
+    $safe_username = mysqli_real_escape_string($dbconn, $username);
+
+
+    //Regular User Login
+    $sql = sprintf("SELECT id, name, password_hash FROM users1 WHERE username = '%s'", $safe_username);
+    $result = mysqli_query($dbconn, $sql);
+    $user_data = $result ? $result->fetch_assoc() : null;
+
+    if ($user_data && password_verify($password_input, $user_data['password_hash'])) {
+        // Successful regular User Login
+        $_SESSION['logged_in'] = true;
+        $_SESSION['username'] = $username;
+        $_SESSION['name'] = $user_data['name'];
+        $_SESSION['user_id'] = $user_data['id']; 
+           
+        header('Location: dashboard.php'); // Redirect standard user to dashboard page
+        exit;
+    }
+
+    $sql = sprintf("SELECT id, name, password_hash FROM user WHERE username = '%s'", $safe_username);
+    $result = mysqli_query($dbconn, $sql);
+    $admin_data = $result ? $result->fetch_assoc() : null;
+
+    if ($admin_data && password_verify($password_input, $admin_data['password_hash'])) {
+        // Successful Admin User Login
+        $_SESSION['adminlogged_in'] = true;
+        $_SESSION['is_admin'] = true;
+        $_SESSION['username'] = $username;
+        $_SESSION['name'] = $admin_data['name'];
+        $_SESSION['user_id'] = $admin_data['id'];
+        header('Location: manage.php'); // Redirect admin to the management page
+        exit;
+    }
+
+    //both login attempts failed.
+    header('Location: login.php?error=Invalid username or password.');
+    exit;
+}
+
+// Close connection if it was successfully opened
+if (isset($dbconn) && $dbconn) {
+    $dbconn->close();
+}
+?>
 <head>
     <style>
         * {
@@ -92,9 +82,9 @@ include 'nav.inc';
 
         body {
             display: grid;
-            grid-template-rows: auto 1fr auto; 
-            grid-template-columns: 100%; 
-            min-height: 100vh; 
+            grid-template-rows: auto 1fr auto;
+            grid-template-columns: 100%;
+            min-height: 100vh;
             margin: 0;
             background: #f0f0f0;
             padding: 0;
@@ -104,7 +94,7 @@ include 'nav.inc';
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; 
+            justify-content: center;
             padding: 40px 20px;
             width: 100%;
         }
@@ -116,10 +106,10 @@ include 'nav.inc';
 
         form {
             width: 400px;
-            max-width: 90%; 
+            max-width: 90%;
             border: 1px solid #ddd;
             padding: 30px;
-            background: white; 
+            background: white;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -136,7 +126,7 @@ include 'nav.inc';
             border-radius: 5px;
             font-size: 16px;
         }
-        
+
         label {
             color: #555;
             font-size: 16px;
@@ -179,30 +169,27 @@ include 'nav.inc';
 </head>
 <body>
     <div class="main-content-area">
-        <h2><?php echo htmlspecialchars($currentPage); ?></h2> 
-        
-        <form method="post"> 
+        <h2><?php echo $pageHeading; ?></h2>
+        <?php if (isset($db_error)) { ?>
+            <!-- Display database connection error if it occurred.-->
+            <p class="error"><?php echo htmlspecialchars($db_error); ?></p>
+        <?php } ?>
+        <form method="post">
             <?php
             if (isset($_GET['error'])) { ?>
                 <p class='error'><?php echo htmlspecialchars($_GET['error']); ?></p>
-            <?php 
-            } elseif ($is_invalid) { ?>
-                <p class='error'>Invalid username or password</p>
             <?php } ?>
 
             <label for="username">Username</label>
-<<<<<<< HEAD
-            <input type="text" id="username" name="username" placeholder="Username">
-=======
             <input type="text" id="username" name="username" placeholder="Username" required
                    value="<?= htmlspecialchars($username_value) ?>">
->>>>>>> 68dc185977e386d18ef9e6c38c12d5002499a88e
             
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Password">
+            <input type="password" id="password" name="password" placeholder="Password" required>
             
             <button type="submit">Login</button>
+
+            <p>New Here?<a href="register.php">Sign Up</a></p>
         </form>
     </div>
-    
 <?php include 'footer.inc'; ?>

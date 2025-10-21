@@ -1,25 +1,30 @@
 <?php
+$currentPage = 'jobs'; 
+$pageTitle = 'JSM Jobs Applications Page'; 
+$pageDescription = 'Careers page for JSM website'; 
+$pageHeading = 'Careers - Positions Available'; 
 
-$currentPage = 'jobs';
-$pageTitle = 'JSM Jobs Applications Page';
-$pageDescription = 'Careers page for JSM website';
-$pageHeading = 'Careers - Positions Available';
+// Include HTML Components 
+include 'header.inc'; 
+include 'nav.inc'; 
 
-include 'header.inc';
-include 'nav.inc';
-
+// Import Database
 require_once 'settings.php';
+
+// Establish connection to MySQL database
 $conn = mysqli_connect($host, $user, $password, $database);
 
+// Error handling
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    die("Connection failed: " . mysqli_connect_error()); //terminate the execution of the current PHP script
 }
 
+//SQL query to retrieve basic job information from Jobs table and store result
 $sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id ASC";
-$result = mysqli_query($conn, $sql);
+$result = mysqli_query($conn, $sql); 
 ?>
 
-  <aside> <!--Required aside -->
+  <aside> 
     <h2>Why Work With Us?</h2>
         <p>At JSM University, we are committed to advancing digital learning and research. 
         Our IT team collaborates with educators, researchers, and students to deliver 
@@ -55,70 +60,85 @@ $result = mysqli_query($conn, $sql);
   </aside>
 
 <?php
-
-if (mysqli_num_rows($result) > 0) {
-    // Loop through each job record
-    while ($job = mysqli_fetch_assoc($result)) {
-        $refNo = $job['RefNo'];
+    // Main Loop
+while ($job = mysqli_fetch_assoc($result)) { //fetches a result row as an associative array.
+    $refNo = $job['RefNo']; //variable used in subsequent queries to fetch related data
 ?>
+    <!-- Job Section -->
+    <section class="jobscontainer"> 
 
-    <section class="jobscontainer"> <div class="header"><?php echo $job['Title']; ?></div> <h2>Reference Number: <?php echo $refNo; ?></h2> <p><strong>Salary:</strong> <?php echo $job['Salary']; ?></p> 
-        <p><strong>Reports to:</strong> <?php echo $job['ReportsTo']; ?></p> 
-        <p><strong>Short Description:</strong> <?php echo $job['ShortDescription']; ?></p> 
+    <!-- Job Title Header -->   
+    <div class="header"><?php echo $job['Title']; ?></div> 
 
+     <!-- Basic Job Information -->
+    <h2>Reference Number: <?php echo $refNo; ?></h2> 
+    <p><strong>Salary:</strong> <?php echo $job['Salary']; ?></p> 
+    <p><strong>Reports to:</strong> <?php echo $job['ReportsTo']; ?></p> 
+    <p><strong>Short Description:</strong> <?php echo $job['ShortDescription']; ?></p> 
+
+        <!-- Key Responsibilities -->
         <h3>Key Responsibilities</h3> 
         <ul>
         <?php
-            // Display Key Responsibilities
+            // Query to fetch all responsibilities for the job
             $sql_resp = "SELECT Description FROM JobResponsibility WHERE RefNo = '$refNo' ORDER BY RespID ASC";
+
+            // Execute responsibility query
             $responsibilities = mysqli_query($conn, $sql_resp);
             
-            while ($resp = mysqli_fetch_assoc($responsibilities)) {
+            // Loop through all responsibility records for the job
+            while ($resp = mysqli_fetch_assoc($responsibilities)) { //fetches a result row as an associative array.
                 echo '<li>' . $resp['Description'] . '</li>';
             }
         ?>
         </ul>
 
+       <!-- Essential Requirements -->
         <h3>Essential Requirements</h3> 
         <ol> 
         <?php
-            // Display Essential Requirements
+            // Query to fetch all essential requirements for the job
             $sql_ess = "SELECT Description FROM JobEssential WHERE RefNo = '$refNo' ORDER BY EssentialID ASC";
+
+            // Execute essential requirements query
             $essentials = mysqli_query($conn, $sql_ess);
             
-            while ($req = mysqli_fetch_assoc($essentials)) {
-                echo '<li>' . $req['Description'] . '</li>';
+            // Loop through all essential requirement records for the job
+            while ($req = mysqli_fetch_assoc($essentials)) { //fetches a result row as an associative array.
+                echo '<li>' . $req['Description'] . '</li>'; 
             }
         ?>
         </ol>
 
+       <!-- Preferable Requirements -->
+        <h3>Preferable Requirements</h3> 
+        <ul>
         <?php
-            // Display Preferable Requirements
+            // Query to fetch all preferable requirements for the job
             $sql_pref = "SELECT Description FROM JobPreferable WHERE RefNo = '$refNo' ORDER BY PreferableID ASC";
-            $preferables = mysqli_query($conn, $sql_pref);
-            
-            // Only display the heading/list if there are preferable requirements
-            if (mysqli_num_rows($preferables) > 0) {
-                echo '<h3>Preferable Requirements</h3>';
-                echo '<ul>';
-                while ($pref = mysqli_fetch_assoc($preferables)) {
-                    echo '<li>' . $pref['Description'] . '</li>';
-                }
-                echo '</ul>';
-            }
-        ?>
 
-        <p class="apply-button">
+            // Execute preferable requirements query
+            $preferables = mysqli_query($conn, $sql_pref);
+                           
+                // Loop through all preferable requirement records for the job
+                while ($pref = mysqli_fetch_assoc($preferables)) { //fetches a result row as an associative array.
+                    echo '<li>' . $pref['Description'] . '</li>';
+                } 
+        ?>
+        </ul>
+
+        <p class="apply-button"> <!-- Apply Button -->
             <a href="apply.php">Apply Now</a>
         </p>
-    </section>
+
+    </section> <!-- End of jobs -->
 
 <?php
-    } 
-} 
 
-// Close the database connection
-mysqli_close($conn);
+    }  // End of while loop 
 
-include 'footer.inc';
+mysqli_close($conn); // Close Database Connection
+
+include 'footer.inc'; // Include Footer 
+
 ?>
