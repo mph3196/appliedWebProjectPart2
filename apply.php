@@ -24,7 +24,7 @@ include 'nav.inc';
 
 <div class="form-container">
   <h2>Job Application Form</h2>
-  <form id="jobApplicationForm" action="https://mercury.swin.edu.au/it000000/formtest.php" method="POST">
+  <form id="jobApplicationForm" action="process_eoi_form.php" method="POST">
     <?php
             if (isset($_GET['error'])) { ?>
               <p class='error'><?php echo htmlspecialchars($_GET['error']); ?></p>
@@ -93,26 +93,24 @@ include 'nav.inc';
           <!-- Address -->
           <div class="form-group">
             <label for="address">Street Address <span class="required">*</span></label>
-            <input type="text" id="address" name="address" required title="Enter your street address" maxlength="40" >
+            <input type="text" id="address" name="address" title="Enter your street address">
           </div>
           
           <div class="two-column">
             <div class="form-group">
               <label for="suburb">Suburb <span class="required">*</span></label>
-              <input type="text" id="suburb" name="suburb" required
-              title="Enter your suburb" maxlength="40">
+              <input type="text" id="suburb" name="suburb" title="Enter your suburb">
             </div>
               
             <div class="two-column">
               <div class="form-group">
                 <label for="postcode">Postcode <span class="required">*</span></label>
-                <input type="text" id="postcode" name="postcode" required pattern="[0-9]{4}"
-                title="Enter your postcode (exactly 4 digits)" minlength="4" maxlength="4">
+                <input type="text" id="postcode" name="postcode" title="Enter your postcode (exactly 4 digits)">
               </div>
 
               <div class="form-group">
                 <label for="state">State <span class="required">*</span></label>
-                <select id="state" name="state" required>
+                <select id="state" name="state">
                   <option value="">Please select</option>
                   <option value="VIC">VIC</option>
                   <option value="NSW">NSW</option>
@@ -131,14 +129,13 @@ include 'nav.inc';
           <div class="two-column">
             <div class="form-group">
               <label for="email">Email <span class="required">*</span></label>
-              <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-              title="Enter a valid email address (e.g.: user@jsm.com)" placeholder="eg. you@email.com">
+              <input type="email" id="email" name="email" title="Enter a valid email address (e.g.: user@jsm.com)" 
+              placeholder="eg. you@email.com">
             </div>
             
             <div class="form-group">
               <label for="phone">Phone Number <span class="required">*</span></label>
-              <input type="text" id="phone" name="phone" required pattern="[0-9]{8,12}"
-              title="Enter a phone number between 8 and 12 digits" minlength="8" maxlength="12">
+              <input type="text" id="phone" name="phone" title="Enter a phone number between 8 and 12 digits">
             </div>
           </div>
         </fieldset>
