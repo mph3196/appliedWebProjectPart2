@@ -32,7 +32,7 @@ if (!$conn) {
 }
 ?>
 
-<header class="user-header">
+<header style="display:flex; justify-content:space-between; align-items:center; background:#1976d2; color:white; padding:1em;">
     <h2 style="margin:0;">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></h2>
 </header>
 
