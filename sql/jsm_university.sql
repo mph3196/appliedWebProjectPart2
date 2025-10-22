@@ -289,24 +289,6 @@ INSERT INTO `user` (`id`, `username`, `password_hash`, `name`, `member`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users1`
---
-
-CREATE TABLE `users1` (
-  `id` int(11) NOT NULL,
-  `name` varchar(128) DEFAULT NULL,
-  `username` varchar(128) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users1`
---
-
-INSERT INTO `users1` (`id`, `name`, `username`, `password_hash`) VALUES
-('?', '?', '?', '?');
-
---
 -- Indexes for dumped tables
 --
 
