@@ -1,5 +1,5 @@
 <?php
-// Used GPT 5 to develop the dashboard page
+// Used GPT 5 to develop parts of the dashboard page
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -13,7 +13,7 @@ if (!isset($_SESSION['name'])) {
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     session_unset();
     session_destroy();
-    header('Location: login.php?error=' . urlencode('Please log in to access the dashboard.'));
+    header('Location: login.php?error=Please log in to access the dashboard.');
     exit;
 }
 
@@ -32,8 +32,8 @@ include 'header.inc';
 include 'nav.inc';
 
 // Connect to the database
-$dbconn = mysqli_connect($host, $user, $password, $database);
-if (!$dbconn) {
+$conn = mysqli_connect($host, $user, $password, $database);
+if (!$conn) {
     die("<div style='padding: 20px;'><p style='color: red;'>Database connection error: " . mysqli_connect_error() . "</p></div>");
 }
 
@@ -45,7 +45,7 @@ $query = "SELECT RefNo, ApplyDate, FirstName, LastName, Skills, OtherSkills, Sta
           WHERE ID = $user_id
           ORDER BY ApplyDate DESC";
           
-$result = mysqli_query($dbconn, $query);
+$result = mysqli_query($conn, $query);
 
 if (!$result) {
     $error = "Error fetching applications: " . mysqli_error($dbconn);
@@ -168,7 +168,7 @@ if (!$result) {
     if ($result) {
         mysqli_free_result($result);
     }
-    mysqli_close($dbconn);
+    mysqli_close($conn);
     ?>
 </div>
 
