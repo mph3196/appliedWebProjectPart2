@@ -13,27 +13,27 @@ include 'nav.inc';
 
 // Database connection
 require_once "settings.php";
-$dbconn = mysqli_connect($host, $user, $password, $database); 
+$conn = mysqli_connect($host, $user, $password, $database); 
 
-if (!$dbconn) {
-    $db_error = "Unable to connect to the database.";
+if (!$conn) {
+    $conn_error = "Unable to connect to the database.";
 }
 
 // Handle login attempt
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    if (isset($db_error)) {
+    if (isset($conn_error)) {
         header('Location: login.php?error=Database connection error. Please try again later.');
         exit;
     }
     
     $username = trim($_POST['username']);
     $password_input = $_POST['password'];
-    $safe_username = mysqli_real_escape_string($dbconn, $username);
+    $safe_username = mysqli_real_escape_string($conn, $username);
 
     // Single query - check User table only
     $sql = sprintf("SELECT id, name, password_hash FROM User WHERE username = '%s'", $safe_username);
-    $result = mysqli_query($dbconn, $sql);
+    $result = mysqli_query($conn, $sql);
     $user_data = $result ? $result->fetch_assoc() : null;
 
     if ($user_data && password_verify($password_input, $user_data['password_hash'])) {
@@ -57,10 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header('Location: login.php?error=Invalid username or password.');
     exit;
 }
-
 ?>
-<!DOCTYPE html>
-<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -161,9 +159,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
     <div class="main-content-area">
         <h2><?php echo $pageHeading; ?></h2>
-        <?php if (isset($db_error)) { ?>
+        <?php if (isset($conn_error)) { ?>
             <!-- Display database connection error if it occurred -->
-            <p class="error"><?php echo htmlspecialchars($db_error); ?></p>
+            <p class="error"><?php echo htmlspecialchars($conn_error); ?></p>
         <?php } ?>
         <form method="post">
             <?php
@@ -183,8 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
     </div>
 <?php
-mysqli_close($dbconn);
+mysqli_close($conn);
 include 'footer.inc';
 ?>
 </body>
-</html>
