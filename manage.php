@@ -1,10 +1,13 @@
 <?php
+// Checks whether a session has been started
 if (session_status() == PHP_SESSION_NONE) {
+    // Starts a session if none
     session_start();
 }
 
-// Check if admin is logged in
+// Check if the user is exactly admin and is the one logged in
 if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'Admin') {
+    // If authorization fails(if user is not admin) the user is redirected to login page with an error
     header('Location: login.php?error=Access denied. Administrator privileges required.');
     exit;
 }
@@ -90,37 +93,61 @@ include 'nav.inc';
     <p>This panel is for administrators to view and manage all Expressions of Interest (EOIs).</p>
     </div>
 <?php
+// Includes settigs file
 require_once "settings.php";
+// Attempts to connect to the database
 $conn = mysqli_connect($host, $user, $password, $database);
+// Checks for any connection failure from the database
 if (!$conn) {
+    // If connection fails and error message is displayed
     echo "<p>Unable to connect to the database.</p>";
     exit;
 }
+// // Check for admin role, 'Admin' username, and a form submission (POST request)
 if (
     isset($_SESSION['username']) &&
     $_SESSION['username'] === 'Admin' &&
     $_SERVER['REQUEST_METHOD'] === 'POST'
 ) {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    // Get the new status from the post data
     $status = $_POST['status'] ?? '';
+
+    // Check if ID is valid (greater than 0) and the status is one of the 3 allowed values
     if ($id > 0 && in_array($status, ['New','Current','Final'], true)) {
+        // A paramterised SQL statement to update the status
         $stmt = mysqli_prepare($conn, "UPDATE eoi SET status=? WHERE id=?");
+        // Bind the status and ID parameters to the statement
         mysqli_stmt_bind_param($stmt, "si", $status, $id);
+        // Execute statement
         mysqli_stmt_execute($stmt);
+        // Close statement
         mysqli_stmt_close($stmt);
     }
+    // Redirect back to the same page
     header("Location: " . $_SERVER['PHP_SELF']); // avoid re-submit on refresh
     exit;
 }
+// SQL query to select all data from the 'eoi' table, ordered by Reference Number
 $query = "SELECT * FROM eoi ORDER BY RefNo";
+// Store in result and executes the query
 $result = mysqli_query($conn, $query);
+
+// Checks if the query execution failed
 if (!$result) {
+    // If query fauled, error is displayed
     echo "<p>Error in query: " . mysqli_error($conn) . "</p>";
 }
+
+// Checks if query was successful and atleast returned one row of data 
 if ($result && mysqli_num_rows($result) > 0) {
+        // Table Responsive class
         echo "<div class='table-responsive'>";
+        // EOI table class
         echo "<table class='eoi-table'>";
+        // Table header row with its column names
         echo "<tr><th>RefNo</th><th>ID</th><th>ApplyDate</th><th>FirstName</th><th>LastName</th><th>DOB</th><th>Gender</th><th>Address</th><th>Suburb</th><th>Email</th><th>Phone.No</th><th>Skills</th><th>Other Skills</th><th>Status</th></tr>";
+        // Loop each row of the query result
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<tr>";
             echo "<td>" . htmlspecialchars($row['RefNo']) . "</td>";
@@ -136,18 +163,31 @@ if ($result && mysqli_num_rows($result) > 0) {
             echo "<td>" . htmlspecialchars($row['PhoneNo']) . "</td>";
             echo "<td>" . htmlspecialchars($row['Skills']) . "</td>";
             echo "<td>" . htmlspecialchars($row['OtherSkills']) . "</td>";
+            // Start of the table data for EOI status
             echo "<td>";
+            // Get the current status for the row
             $currentStatus = htmlspecialchars($row['Status'] ?? '');
+            // Form for status update (using post to the current page)
             echo '<form method="post" action="' . htmlspecialchars($_SERVER['PHP_SELF']). '" class="status-form" style="display: inline-flex;">';
+            // Pass the EOI ID to the post request
             echo '<input type="hidden" name="id" value="' . (int)$row['ID'] . '">';
+            // Status selelction dropdown menu
             echo '<select name="status">';
+            // Option for New, selected if it matches the current status
             echo '<option value="New"' . ($currentStatus == 'New' ? ' selected' : '') . '>New</option>';
+            // Option for Current, selected if it matches the current status
             echo '<option value="Current"' . ($currentStatus == 'Current' ? ' selected' : '') . '>Current</option>';
+            // Option for New, selected if it matches the current status
             echo '<option value="Final"' . ($currentStatus == 'Final' ? ' selected' : '') . '>Final</option>';
+            // Select tag closed
             echo '</select>';
+            // Button to save the new status
             echo '<input type="submit" value="Save">';
+            // Form tag closed
             echo '</form>';
+            // Status table data tag closed
             echo "</td>";
+            // Table row closed
             echo "</tr>";
         }
     echo "</table>";
@@ -155,9 +195,13 @@ if ($result && mysqli_num_rows($result) > 0) {
     //if there are no EOIs found in the table
     echo "<p>There are no EOIs to display.</p>";
 }
+
+// If the query was successful (returned the list of data)
 if ($result) {
+    // Comoputer memory free up that was used to hold the list of EOIs
     mysqli_free_result($result);
 }
+// Close the datatbase connection
 mysqli_close($conn);
 ?>
 </div>
