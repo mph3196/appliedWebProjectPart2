@@ -11,33 +11,45 @@ $pageHeading = 'Login';
 include 'header.inc';
 include 'nav.inc';
 
-// Database connection
-require_once "settings.php";
-$dbconn = mysqli_connect($host, $user, $password, $database); 
+// includes settings file
+require "settings.php";
+// Attempts to connect to the database
+$conn = mysqli_connect($host, $user, $password, $database); 
 
-if (!$dbconn) {
-    $db_error = "Unable to connect to the database.";
+// Checks if the connection failed
+if (!$conn) {
+    // If connection failed displays error messgae
+    $conn_error = "Unable to connect to the database.";
 }
 
-// Handle login attempt
+// Handle login attempt by form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    if (isset($db_error)) {
+    // If there is a database connection error
+    if (isset($conn_error)) {
+        // Redirects the user to login page with error message
         header('Location: login.php?error=Database connection error. Please try again later.');
         exit;
     }
     
+    // Gets the username input
     $username = trim($_POST['username']);
+    // Gets the password input
     $password_input = $_POST['password'];
-    $safe_username = mysqli_real_escape_string($dbconn, $username);
+    // Escape special characters in the username to prevent simple SQL Injection
+    $safe_username = mysqli_real_escape_string($conn, $username);
 
-    // Single query - check User table only
+    // SQL query to select ID, full name, and the stored password hash for the entered username
     $sql = sprintf("SELECT id, name, password_hash FROM User WHERE username = '%s'", $safe_username);
-    $result = mysqli_query($dbconn, $sql);
+    // Execute the query
+    $result = mysqli_query($conn, $sql);
+    // Get the user's data if the query was successfull otherwise set to null.
     $user_data = $result ? $result->fetch_assoc() : null;
 
+    // Check if the user data was found and if the submitted password matches the stored hash.
     if ($user_data && password_verify($password_input, $user_data['password_hash'])) {
         // Successful login
+        // Set session variables to mark the user as logged in.
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['name'] = $user_data['name'];
@@ -46,21 +58,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Check if admin and set flag
         if ($username === 'Admin') {
             $_SESSION['is_admin'] = true;
+            // Send the admin to the manage page
             header('Location: manage.php');
         } else {
+            // Send regular users to their dashboard
             header('Location: dashboard.php');
         }
         exit;
     }
 
-    // Login failed
+    // Login failed redirects user to the login page with error message
     header('Location: login.php?error=Invalid username or password.');
     exit;
 }
-
 ?>
-<!DOCTYPE html>
-<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -161,12 +173,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
     <div class="main-content-area">
         <h2><?php echo $pageHeading; ?></h2>
-        <?php if (isset($db_error)) { ?>
-            <!-- Display database connection error if it occurred -->
-            <p class="error"><?php echo htmlspecialchars($db_error); ?></p>
+        <?php 
+            // Error message for database connection
+            if (isset($conn_error)) { ?>
+            <p class="error"><?php echo htmlspecialchars($conn_error); ?></p>
         <?php } ?>
         <form method="post">
             <?php
+            // Error message for login failure
             if (isset($_GET['error'])) { ?>
                 <p class='error'><?php echo htmlspecialchars($_GET['error']); ?></p>
             <?php } ?>
@@ -183,8 +197,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
     </div>
 <?php
-mysqli_close($dbconn);
-include 'footer.inc';
+// Closes database connection
+mysqli_close($conn);
 ?>
 </body>
-</html>
+<?php include 'footer.inc'; ?>

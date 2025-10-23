@@ -109,6 +109,7 @@ include 'nav.inc';
         
         <form action="process_register.php" method="post"> 
             <?php
+            // Displays the error message
             if (isset($_GET['error'])) { ?>
                 <p class='error'><?php echo $_GET['error']; ?></p>
             <?php } ?>
