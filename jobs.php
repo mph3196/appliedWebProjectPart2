@@ -62,7 +62,7 @@ $result = mysqli_query($conn, $sql);
 <?php
     // Main Loop
 while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative array.
-    $refNo = $job['RefNo']; //variable used in subsequent queries to fetch related data
+    $refNo = $job['RefNo']; //variable used in queries to get related data
 ?>
     <!-- Job Section -->
     <section class="jobscontainer"> 
@@ -76,6 +76,8 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative
     <p><strong>Reports to:</strong> <?php echo $job['ReportsTo']; ?></p> 
     <p><strong>Short Description:</strong> <?php echo $job['ShortDescription']; ?></p> 
 
+
+
         <!-- Key Responsibilities -->
         <h3>Key Responsibilities</h3> 
         <ul>
@@ -88,10 +90,12 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative
             
             // Loop through all responsibility records for the job
             while ($resp = mysqli_fetch_assoc($responsibilities)) { //fetches a result row as an associative array.
-                echo '<li>' . $resp['Description'] . '</li>';
-            }
+                echo '<li>' . $resp['Description'] . '</li>'; //concatonation
+            } 
         ?>
         </ul>
+
+
 
        <!-- Essential Requirements -->
         <h3>Essential Requirements</h3> 
@@ -110,6 +114,8 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative
         ?>
         </ol>
 
+
+
        <!-- Preferable Requirements -->
         <h3>Preferable Requirements</h3> 
         <ul>
@@ -126,6 +132,8 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative
                 } 
         ?>
         </ul>
+
+        
 
         <p class="apply-button"> <!-- Apply Button -->
             <a href="apply.php?refNo=<?php echo $refNo; ?>">Apply Now</a>
