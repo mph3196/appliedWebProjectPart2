@@ -36,7 +36,7 @@ include 'nav.inc';
 
 <div class="form-container">
     <h2>Job Application Form</h2>
-    <form id="jobApplicationForm" action="process_eoi_form.php" method="POST">
+    <form id="jobApplicationForm" action="process_eoi.php" method="POST">
         <?php
         // Display error from session
         if (!empty($error)) { ?>

@@ -78,21 +78,39 @@ while ($member = mysqli_fetch_assoc($members)) {
 	
     echo '<p>' . $member['Bio'] . '</p>';
 	
+  // Roles
 	$sql = "SELECT * FROM Role WHERE MemberID = '" . $member['MemberID'] . "'";
 	$roles = mysqli_query($conn, $sql);
 	
 	while ($role = mysqli_fetch_assoc($roles)) {
 		echo '<p><strong>Role: </strong>' . $role['Description'] . '</p>';
 	}
-	
-	echo '<p><strong>Contributions:</strong></p>';
-	echo '<ul>';
-	echo '<li><strong>Individual Responsibility:</strong>NEED TO DYNAMISE</li>';
-    echo '<li><strong>Shared Responsibilities:</strong>NEED TO DYNAMISE</li>';
-	echo '</ul>';
-	echo '<p><strong>Favourite Hobbies:</strong></p>';
-	echo '<ul>';
-	
+
+  // Contributions
+echo "<strong>Contributions:</strong>";
+echo "<p><ul>";
+
+$sql = "
+    SELECT t.Description 
+    FROM CONTRIBUTION c 
+    JOIN Task t ON c.TaskID = t.TaskID 
+    JOIN About a ON c.AID = a.AID 
+    WHERE a.MemberID = " . $member['MemberID'] . "
+    ORDER BY t.TaskID
+";
+
+$tasks = mysqli_query($conn, $sql);
+
+while ($task = mysqli_fetch_assoc($tasks)) {
+    echo "<li>" . $task['Description'] . "</li>";
+}
+
+echo "</ul></p>";
+
+
+  // Hobbies
+  echo "<strong>Hobbies:</strong>";
+  echo "<ul>";
 	$sql = "SELECT * FROM Hobby WHERE MemberID = '" . $member['MemberID'] . "'";
 	$hobbies = mysqli_query($conn, $sql);
 	
