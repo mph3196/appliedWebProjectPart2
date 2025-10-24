@@ -1,4 +1,5 @@
 <?php
+// Define Specific Page Variables
 $currentPage = 'jobs'; 
 $pageTitle = 'JSM Jobs Applications Page'; 
 $pageDescription = 'Careers page for JSM website'; 
@@ -19,9 +20,34 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error()); //terminate the execution of the current PHP script
 }
 
-//SQL query to retrieve basic job information from Jobs table and store result
-$sql = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id"; //https://www.w3schools.com/sql/sql_orderby.asp
-$result = mysqli_query($conn, $sql); 
+// ===== Fetch all Data Required =====
+
+$sql_jobs = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id"; // Get all jobs
+$jobs_result = mysqli_query($conn, $sql_jobs);
+
+$sql_resp = "SELECT RefNo, Description FROM JobResponsibility ORDER BY RefNo, RespID"; // Get all responsibilities
+$resp_result = mysqli_query($conn, $sql_resp);
+
+$sql_ess = "SELECT RefNo, Description FROM JobEssential ORDER BY RefNo, EssentialID"; // Get all essential requirements
+$ess_result = mysqli_query($conn, $sql_ess);
+
+$sql_pref = "SELECT RefNo, Description FROM JobPreferable ORDER BY RefNo, PreferableID"; // Get all preferable requirements
+$pref_result = mysqli_query($conn, $sql_pref);
+
+
+// ===== Organise Data in Arrays =====
+
+$responsibilities = []; // Stores responsibilities by RefNo
+while ($row = mysqli_fetch_assoc($resp_result)) {
+    $responsibilities[$row['RefNo']][] = $row['Description']; }
+
+$essentials = []; // Store essential requirements by RefNo
+while ($row = mysqli_fetch_assoc($ess_result)) {
+    $essentials[$row['RefNo']][] = $row['Description']; }
+
+$preferables = []; // Store preferable requirements by RefNo
+while ($row = mysqli_fetch_assoc($pref_result)) {
+    $preferables[$row['RefNo']][] = $row['Description']; }
 ?>
 
   <aside> 
@@ -60,9 +86,11 @@ $result = mysqli_query($conn, $sql);
   </aside>
 
 <?php
-    // Main Loop
-while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative array.
-    $refNo = $job['RefNo']; //variable used in queries to get related data
+
+// ===== Display all Jobs =====
+
+while ($job = mysqli_fetch_assoc($jobs_result)) { // Fetches one row as an associative array.
+    $refNo = $job['RefNo']; 
 ?>
     <!-- Job Section -->
     <section class="jobscontainer"> 
@@ -76,77 +104,54 @@ while ($job = mysqli_fetch_assoc($result)) { //fetches one row as an associative
     <p><strong>Reports to:</strong> <?php echo $job['ReportsTo']; ?></p> 
     <p><strong>Short Description:</strong> <?php echo $job['ShortDescription']; ?></p> 
 
-
-
-        <!-- Key Responsibilities -->
+<!-- Key Responsibilities -->
         <h3>Key Responsibilities</h3> 
         <ul>
         <?php
-            // Query to fetch all responsibilities for the job
-            $sql_resp = "SELECT Description FROM JobResponsibility WHERE RefNo = '$refNo' ORDER BY RespID"; //https://www.w3schools.com/sql/sql_orderby.asp
-
-            // Execute responsibility query
-            $responsibilities = mysqli_query($conn, $sql_resp);
-            
-            // Loop through all responsibility records for the job
-            while ($resp = mysqli_fetch_assoc($responsibilities)) { //fetches a result row as an associative array.
-                echo '<li>' . $resp['Description'] . '</li>'; //concatonation
-            } 
+            if (isset($responsibilities[$refNo])) {
+                foreach ($responsibilities[$refNo] as $resp) {
+                    echo '<li>' . $resp . '</li>';
+                }
+            }
         ?>
         </ul>
 
-
-
-       <!-- Essential Requirements -->
+        <!-- Essential Requirements -->
         <h3>Essential Requirements</h3> 
         <ol> 
         <?php
-            // Query to fetch all essential requirements for the job
-            $sql_ess = "SELECT Description FROM JobEssential WHERE RefNo = '$refNo' ORDER BY EssentialID"; //https://www.w3schools.com/sql/sql_orderby.asp
-
-            // Execute essential requirements query
-            $essentials = mysqli_query($conn, $sql_ess);
-            
-            // Loop through all essential requirement records for the job
-            while ($req = mysqli_fetch_assoc($essentials)) { //fetches a result row as an associative array.
-                echo '<li>' . $req['Description'] . '</li>'; 
+            if (isset($essentials[$refNo])) {
+                foreach ($essentials[$refNo] as $ess) {
+                    echo '<li>' . $ess . '</li>';
+                }
             }
         ?>
         </ol>
 
-
-
-       <!-- Preferable Requirements -->
+        <!-- Preferable Requirements -->
         <h3>Preferable Requirements</h3> 
         <ul>
         <?php
-            // Query to fetch all preferable requirements for the job
-            $sql_pref = "SELECT Description FROM JobPreferable WHERE RefNo = '$refNo' ORDER BY PreferableID"; //https://www.w3schools.com/sql/sql_orderby.asp
-
-            // Execute preferable requirements query
-            $preferables = mysqli_query($conn, $sql_pref);
-                           
-                // Loop through all preferable requirement records for the job
-                while ($pref = mysqli_fetch_assoc($preferables)) { //fetches a result row as an associative array.
-                    echo '<li>' . $pref['Description'] . '</li>';
-                } 
+            if (isset($preferables[$refNo])) {
+                foreach ($preferables[$refNo] as $pref) {
+                    echo '<li>' . $pref . '</li>';
+                }
+            }
         ?>
         </ul>
 
-        
-
-        <p class="apply-button"> <!-- Apply Button -->
+        <p class="apply-button">
             <a href="apply.php?refNo=<?php echo $refNo; ?>">Apply Now</a>
         </p>
 
-    </section> <!-- End of jobs -->
+    </section> 
 
 <?php
-
-    }  // End of while loop 
+}  // End of while loop 
 
 mysqli_close($conn); // Close Database Connection
 
-include 'footer.inc'; // Include Footer 
+include 'footer.inc'; 
 
+// NOTE: Incorporated work referenced to https://www.w3schools.com/php/
 ?>
