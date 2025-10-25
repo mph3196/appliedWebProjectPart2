@@ -49,7 +49,7 @@ $sql = 'INSERT INTO User (name, username, password_hash)
 $stmt = $conn->stmt_init();
 // Send the $sql to the database to get it prepared
 if (! $stmt->prepare($sql)) {
-    // If databse cant get $sql stops and shows error
+    // If databse cant get $sql script stops and shows error
     die("SQL prepare error: ". $conn->error);
 }
 
