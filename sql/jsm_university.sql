@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2025 at 04:54 AM
+-- Generation Time: Oct 26, 2025 at 05:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -361,8 +361,8 @@ ALTER TABLE `contribution`
 --
 ALTER TABLE `eoi`
   ADD PRIMARY KEY (`EOIno`),
-  ADD UNIQUE KEY `ID` (`ID`,`RefNo`),
-  ADD KEY `RefNo` (`RefNo`);
+  ADD KEY `RefNo` (`RefNo`),
+  ADD KEY `eoi_ibfk_2` (`ID`);
 
 --
 -- Indexes for table `hobby`
@@ -440,7 +440,7 @@ ALTER TABLE `contribution`
 -- AUTO_INCREMENT for table `eoi`
 --
 ALTER TABLE `eoi`
-  MODIFY `EOIno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `EOIno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `hobby`
