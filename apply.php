@@ -3,10 +3,29 @@
 session_start();
 require_once 'settings.php';
 
-// Connect to the database
-$conn = mysqli_connect($host, $user, $password, $database);
+// Page meta settings
+$currentPage = 'apply';
+$pageTitle = 'JSM University Job Applications';
+$pageDescription = 'Applications page for JSM University';
+$pageHeading = 'Apply';
+
+// Include header and nav bar
+include 'header.inc';
+include 'nav.inc';
+
+// Disable MySQLi exceptions
+mysqli_report(MYSQLI_REPORT_OFF);
+// Establish connection to MySQL database
+$conn = @mysqli_connect($host, $user, $password, $database);
+
+// Check connection
 if (!$conn) {
-    echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
+    echo "<div class='container'>";
+    echo "<h1>Database Connection Error</h1>";
+    echo "<p>Sorry, we are unable to retrieve job listings at the moment. Please try again later.</p>";
+    echo "<p>Debug info: " . mysqli_connect_error() . "</p>";
+    include 'footer.inc';
+    exit;
 }
 
 if (!isset($_SESSION['user_id'])) {
@@ -14,6 +33,8 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: login.php?error=You must log in to submit an application.');
     exit;
 }
+
+$userId = $_SESSION['user_id'];
 
 // Check for redirect from jobs page
 if (isset($_GET['refNo'])) {
@@ -24,11 +45,6 @@ if (isset($_GET['refNo'])) {
     $_SESSION['form_data']['refNo'] = $_GET['refNo'];
 }
 
-$userId = $_SESSION['user_id'];
-$currentPage = 'apply';
-$pageTitle = 'JSM University Job Applications';
-$pageDescription = 'Applications page for JSM University';
-$pageHeading = 'Apply';
 
 // Get the user's name
 $sql = "SELECT name FROM User WHERE id = $userId";
@@ -45,8 +61,6 @@ if ($result && mysqli_num_rows($result) > 0) {
 $form_data = isset($_SESSION['form_data']) ? $_SESSION['form_data'] : array();
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 
-include 'header.inc';
-include 'nav.inc';
 ?>
 
 <div class="container" id="apply-container">

@@ -12,12 +12,19 @@ include 'nav.inc';
 // Import Database
 require_once 'settings.php';
 
+// Disable MySQLi exceptions
+mysqli_report(MYSQLI_REPORT_OFF);
 // Establish connection to MySQL database
-$conn = mysqli_connect($host, $user, $password, $database);
+$conn = @mysqli_connect($host, $user, $password, $database);
 
-// Error handling
+// Check connection
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error()); //terminate the execution of the current PHP script
+    echo "<div class='container'>";
+    echo "<h1>Database Connection Error</h1>";
+    echo "<p>Sorry, we are unable to retrieve job listings at the moment. Please try again later.</p>";
+    echo "<p>Debug info: " . mysqli_connect_error() . "</p>";
+    include 'footer.inc';
+    exit;
 }
 
 // ===== Fetch all Data Required =====
@@ -50,7 +57,7 @@ while ($row = mysqli_fetch_assoc($pref_result)) {
     $preferables[$row['RefNo']][] = $row['Description']; }
 ?>
 
-  <aside> 
+<aside> 
     <h2>Why Work With Us?</h2>
         <p>At JSM University, we are committed to advancing digital learning and research. 
         Our IT team collaborates with educators, researchers, and students to deliver 
@@ -83,7 +90,7 @@ while ($row = mysqli_fetch_assoc($pref_result)) {
     <div style="background-color: #444754; color: white; padding: 15px; border-radius: 5px;">
         <p><strong>Pro Tip:</strong> Highlight your experience with educational technology and your passion for digital learning in your application!</p>
     </div>
-  </aside>
+</aside>
 
 <?php
 

@@ -1,4 +1,6 @@
 <?php
+require_once 'settings.php';
+
 $currentPage = 'about';
 $pageTitle = 'JSM About Us Page';
 $pageDescription = 'About page for JSM University';
@@ -7,9 +9,20 @@ $pageHeading = 'About Us';
 include 'header.inc';
 include 'nav.inc';
 
-require_once 'settings.php';
-$conn = mysqli_connect($host, $user, $password, $database);
+// Disable MySQLi exceptions
+mysqli_report(MYSQLI_REPORT_OFF);
+// Establish connection to MySQL database
+$conn = @mysqli_connect($host, $user, $password, $database);
 
+// Check connection
+if (!$conn) {
+    echo "<div class='container'>";
+    echo "<h1>Database Connection Error</h1>";
+    echo "<p>Sorry, we are unable to retrieve job listings at the moment. Please try again later.</p>";
+    echo "<p>Debug info: " . mysqli_connect_error() . "</p>";
+    include 'footer.inc';
+    exit;
+}
 if (!$conn) {
     echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
 }
