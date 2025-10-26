@@ -314,13 +314,13 @@ include 'nav.inc';
 </div>
 <div class="search">
     <form method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
-        <label for="refno_input">First Name Search:</label>
-        <input type="text" id="firstname_search" name="onesearch" 
-        value="<?php echo isset($_GET['search_firstname']) ? htmlspecialchars($_GET['search_firstname']) : ''; ?>" placeholder="e.g., John">
+        <label for="firstname_search">First Name Search:</label>
+        <input type="text" id="firstname_search" name="search_firstname" 
+        value="<?php echo isset($_GET['search_firstname']) ? htmlspecialchars($_GET['search_lastname']) : ''; ?>" placeholder="e.g., John">
 
         <label for="lastname_search">Last Name Search:</label>
         <input type="text" id="lastname_search" name="search_lastname" 
-        value="<?php echo isset($_GET['search_lastname']) ? htmlspecialchars($_GET['search_lastname']) : ''; ?>" placeholder="e.g., Doe">
+        value="<?php echo isset($_GET['search_lastname']) ? htmlspecialchars($_GET['search_firstname']) : ''; ?>" placeholder="e.g., Doe">
 
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
@@ -328,32 +328,29 @@ include 'nav.inc';
 
 <?php
 
-$search_term = '';
-$result = null;
+$search_performed = false;
+$get_name = [];
 
 // Check if a first name search term is provided in the GET request
-if (isset($_GET['search_firstname']) && !empty(($_GET['search_firstname']))) {
-    $search_term = trim($_GET['search_firstname']);
-    // Sanitize the search term for LIKE query
-    $search_like = "%" . $search_term . "%";
+if (!empty($_GET['search_firstname'])) {
+    $FirstName = mysqli_real_escape_string($conn, $_GET['search_firstname']);
+    $get_name[] = "FirstName LIKE '%$FirstName%'";
+    $search_performed = true;
+}
 
-    // SQL query with WHERE clause, ordered by RefNo
-    // NOTE: Using prepared statements for security against SQL Injection
-    $query = "SELECT * FROM eoi WHERE FirstName LIKE ? ORDER BY RefNo";
-    
-    $stmt = mysqli_prepare($conn, $query);
-    // Bind the search parameter (s for string)
-    mysqli_stmt_bind_param($stmt, "s", $search_like);
-    
-    // Execute the statement
-    mysqli_stmt_execute($stmt);
-    
-    // Get the result set from the prepared statement
-    $result = mysqli_stmt_get_result($stmt);
-    
+if (!empty($_GET['search_lastname'])) {
+    $LastName = mysqli_real_escape_string($conn, $_GET['search_lastname']);
+    $get_name[] = "LastName LIKE '%$LastName%'";
+    $search_performed = true;
+}
+
+$query = "SELECT * FROM eoi";
+
+if ($search_performed){
+    $query .= " WHERE " . implode(" AND ", $get_name);
 }
 // SQL query to select all data from the 'eoi' table, ordered by Reference Number
-$query = "SELECT * FROM eoi ORDER BY RefNo";
+$query .= " ORDER BY RefNo";
 // Store in result and executes the query
 $result = mysqli_query($conn, $query);
 
