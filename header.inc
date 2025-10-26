@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="description" content="<?php echo $pageDescription; ?>">
-  <meta name="keywords" content="HTML5, CSS layout, web technology project">
+  <meta name="keywords" content="HTML5, CSS layout, web technology project, PHP, MySQL, Database, Apache, XAMPP">
   <meta name="author" content="Morgan Hopkins, Jonathon Taylor, Shaun Vambe">
   <title><?php echo $pageTitle; ?></title>
   
