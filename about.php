@@ -11,7 +11,7 @@ require_once 'settings.php';
 $conn = mysqli_connect($host, $user, $password, $database);
 
 if (!$conn) {
-    echo "<p style='color:red;'>Connection failed: " . mysqli_connect_error() . "</p>";
+    echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
 }
 ?>
 
@@ -84,9 +84,7 @@ while ($member = mysqli_fetch_assoc($members)) {
         SELECT t.Description 
         FROM Contribution c 
         JOIN Task t ON c.TaskID = t.TaskID 
-        JOIN About a ON c.AID = a.AID 
-        WHERE a.MemberID = {$member['MemberID']}
-        ORDER BY t.TaskID
+        WHERE c.MemberID = {$member['MemberID']}
     ";
     $tasks = mysqli_query($conn, $sqlTasks);
     while ($task = mysqli_fetch_assoc($tasks)) {
@@ -106,7 +104,8 @@ while ($member = mysqli_fetch_assoc($members)) {
 
     // Favourite Language & Quote
     echo "<p><strong>Favourite Language:</strong> {$member['FavLanguage']}</p>";
-    echo "<p><strong>Favourite Quote in {$member['FavLanguage']}:</strong> \"{$member['FavQuote']}\"</p>";
+    echo "<p><strong>Favourite Quote in {$member['FavLanguage']}:</strong> 
+      <span lang=\"{$member['LangCode']}\">\"{$member['FavQuote']}\"</span></p>";
 
     echo "</div>"; // end container
 }
@@ -129,12 +128,12 @@ while ($member = mysqli_fetch_assoc($members)) {
 
             echo "<tr>";
             while ($member = mysqli_fetch_assoc($members)) {
-                echo "<td>{$member['Name']}</td>";
+                echo "<td><strong>{$member['FullName']}</strong></td>";
                 echo "<td>{$member['DreamJob']}</td>";
                 echo "<td>{$member['CodingSnack']}</td>";
-                echo "<td>{$member['FavProgLang']}</td>";
+                echo "<td>{$member['ProgLang']}</td>";
+                echo "</tr>";
             }
-            echo "</tr>";
             ?>
         </tbody>
     </table>
