@@ -190,6 +190,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $conn = mysqli_connect($host, $user, $password, $database);
     if (!$conn) {
         echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
+        exit;
+    }
+
+    // Create eoi table if it does not exist
+    $sql_create_eoi = "
+    CREATE TABLE IF NOT EXISTS `eoi` (
+    EOIno INT NOT NULL AUTO_INCREMENT,
+    RefNo VARCHAR(5) NOT NULL,
+    ID INT NOT NULL,
+    ApplyDate DATE NOT NULL DEFAULT CURDATE(),
+    FirstName VARCHAR(20) NOT NULL,
+    LastName VARCHAR(20) NOT NULL,
+    DOB DATE NOT NULL,
+    Gender ENUM('Male','Female','Other','Prefer not to say') NOT NULL,
+    Address VARCHAR(40) NOT NULL,
+    Suburb VARCHAR(40) NOT NULL,
+    Postcode INT(11) NOT NULL,
+    State ENUM('VIC','NSW','QLD','WA','SA','TAS','NT','ACT') NOT NULL,
+    Email VARCHAR(40) NOT NULL,
+    PhoneNo VARCHAR(12) NOT NULL,
+    Skills VARCHAR(128) DEFAULT NULL,
+    OtherSkills VARCHAR(1024) DEFAULT NULL,
+    Status ENUM('New','Current','Final') DEFAULT 'New',
+    PRIMARY KEY (`EOIno`),
+    FOREIGN KEY (`RefNo`) REFERENCES `jobs`(`RefNo`) ON DELETE CASCADE,
+    FOREIGN KEY (`ID`) REFERENCES `user`(`id`) ON DELETE CASCADE
+    );
+    ";
+
+    if (!mysqli_query($conn, $sql_create_eoi)) {
+        echo "<p>Error creating EOI table: " . mysqli_error($conn) . "</p>";
+        exit;
     }
 
     // Escape all string variables for SQL safety

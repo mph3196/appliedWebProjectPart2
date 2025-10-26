@@ -16,9 +16,11 @@ if (session_status() == PHP_SESSION_NONE) {
     <a <?php if($currentPage == 'about') echo 'class="active"'; ?> href="about.php">
       <i class="fa fa-fw fa-star"></i> About Us
     </a>
-    <a <?php if($currentPage == 'signup') echo 'class="active"'; ?> href="register.php">
-      <i class="fa fa-fw fa-user-plus"></i> Sign up
-    </a>
+    <?php if (!isset($_SESSION['username'])): ?>
+        <a <?php if($currentPage == 'signup') echo 'class="active"'; ?> href="register.php">
+          <i class="fa fa-fw fa-user-plus"></i> Sign up
+        </a>
+    <?php endif; ?>
     <?php
       if (isset($_SESSION['username'])) { 
         // 1. Check if the user is an Admin
