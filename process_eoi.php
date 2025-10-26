@@ -3,6 +3,11 @@ session_start();
 $userId = $_SESSION['user_id'];
 require_once 'settings.php';
 
+// Prevent direct access
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: apply.php');
+    exit;
+}
 
 // Sanitise script courtesy of Atie Kia (https://github.com/atieasadikia/COS10026-S2-2025/blob/main/lecture07/form.php)
 function sanitise_input($data){
@@ -211,10 +216,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     // Execute the query
     if (mysqli_query($conn, $sql)) {
-        // If successful, clear session and redirect
+        // Get the auto-generated EOInumber
+        $eoiNumber = mysqli_insert_id($conn);
+
+        // Store EOInumber in session for confirmation page
+        $_SESSION['last_eoi'] = $eoiNumber;
+
+        // Clear form data and errors
         $_SESSION['form_data'] = array();
         $_SESSION['error'] = '';
-        header('Location: dashboard.php');
+
+        // Redirect to confirmation page
+        header('Location: eoi_confirmation.php');
         exit;
     } else {
         // Database error
