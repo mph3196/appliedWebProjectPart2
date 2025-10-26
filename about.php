@@ -18,7 +18,7 @@ $conn = @mysqli_connect($host, $user, $password, $database);
 if (!$conn) {
     echo "<div class='container'>";
     echo "<h1>Database Connection Error</h1>";
-    echo "<p>Sorry, we are unable to retrieve job listings at the moment. Please try again later.</p>";
+    echo "<p>Sorry, we are unable to retrieve the about page. Please try again later.</p>";
     echo "<p>Debug info: " . mysqli_connect_error() . "</p>";
     include 'footer.inc';
     exit;
