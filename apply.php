@@ -1,5 +1,13 @@
 <?php
+// Start the session
 session_start();
+require_once 'settings.php';
+
+// Connect to the database
+$conn = mysqli_connect($host, $user, $password, $database);
+if (!$conn) {
+    echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
+}
 
 if (!isset($_SESSION['user_id'])) {
     // If the user is not logged in, redirected to the login page
@@ -21,6 +29,17 @@ $currentPage = 'apply';
 $pageTitle = 'JSM University Job Applications';
 $pageDescription = 'Applications page for JSM University';
 $pageHeading = 'Apply';
+
+// Get the user's name
+$sql = "SELECT name FROM User WHERE id = $userId";
+$result = mysqli_query($conn, $sql);
+
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $name = $row['name'];
+} else {
+    $name = "";
+}
 
 // Get form data from session if it exists
 $form_data = isset($_SESSION['form_data']) ? $_SESSION['form_data'] : array();
@@ -60,8 +79,9 @@ include 'nav.inc';
             <div class="two-column">
                 <div class="form-group">
                     <label for="firstName">First Name <span class="required">*</span></label>
-                    <input type="text" id="firstName" name="firstName" title="Enter your first name, maximum 20 letters"
-                    value="<?php echo isset($form_data['firstName']) ? htmlspecialchars($form_data['firstName']) : ''; ?>">
+                    <input type="text" id="firstName" name="firstName" 
+                        title="Enter your first name, maximum 20 letters"
+                        value="<?php echo htmlspecialchars($form_data['firstName'] ?? $name ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">

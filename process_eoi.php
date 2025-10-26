@@ -28,7 +28,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $state = sanitise_input($_POST["state"]);
     $email = sanitise_input($_POST["email"]);
     $phone = sanitise_input($_POST["phone"]);
-    $skills = isset($_POST["skills"]) ? implode(", ", array_map('sanitise_input', $_POST["skills"]))
+    $skills = '';
+    if (isset($_POST['skills']) && is_array($_POST['skills'])) {
+        $skills = implode(", ", array_map('sanitise_input', $_POST['skills']));
+    }
     $otherSkills = sanitise_input($_POST['otherSkillsText']);
 
     // Validate Form Data
@@ -184,18 +187,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
     }
 
-    // Convert skills array to a string
-    $skills = isset($_POST["skills"])
-    $skills_string = '';
-    $skills_count = count($skills);
-
-    for ($i = 0; $i < $skills_count; $i++) {
-        if ($i > 0) {
-            $skills_string .= ', ';
-        }
-        $skills_string .= $skills[$i];
-    }
-
     // Escape all string variables for SQL safety
     $refNo = mysqli_real_escape_string($conn, $refNo);
     $firstName = mysqli_real_escape_string($conn, $firstName);
@@ -206,7 +197,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $state = mysqli_real_escape_string($conn, $state);
     $email = mysqli_real_escape_string($conn, $email);
     $phone = mysqli_real_escape_string($conn, $phone);
-    $skills_string = mysqli_real_escape_string($conn, $skills_string);
+    $skills = mysqli_real_escape_string($conn, $skills);
     $otherSkills = mysqli_real_escape_string($conn, $otherSkills);
     // Convert postcode to integer
     $postcode = (int)$postcode;
@@ -216,7 +207,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $sql = "INSERT INTO eoi(RefNo, ID, FirstName, LastName, DOB, Gender, Address, 
         Suburb, Postcode, State, Email, PhoneNo, Skills, OtherSkills, Status) 
         VALUES ('$refNo', $userId, '$firstName', '$lastName', '$dob', '$gender', 
-        '$address', '$suburb', $postcode, '$state', '$email', '$phone', '$skills_string', '$otherSkills', 'New')";
+        '$address', '$suburb', $postcode, '$state', '$email', '$phone', '$skills', '$otherSkills', 'New')";
 
     // Execute the query
     if (mysqli_query($conn, $sql)) {
