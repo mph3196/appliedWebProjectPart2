@@ -325,6 +325,21 @@ include 'nav.inc';
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
 </div>
+<div class="Sort">
+        <label for="sort_field">Sort By:</label>
+        <select name="sort_field" id="sort_field">
+            <option value="RefNo" <?php 
+                if ($sortField == 'RefNo') echo 'selected'; ?>>EOI Reference
+            </option>
+            <option value="LastName" <?php 
+                if ($sortField == 'LastName') echo 'selected'; ?>>Applicant Last Name
+            </option>
+            <option value="Status" <?php 
+                if ($sortField == 'Status') echo 'selected'; ?>>status
+            </option>
+        </select>
+        <button type="submit" class="btn btn-primary">Sort</button>
+</div>
 
 <?php
 
