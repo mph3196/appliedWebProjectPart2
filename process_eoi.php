@@ -28,7 +28,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $state = sanitise_input($_POST["state"]);
     $email = sanitise_input($_POST["email"]);
     $phone = sanitise_input($_POST["phone"]);
-    $skills = isset($_POST["skills"]) ? $_POST["skills"] : [];
+    $skills = isset($_POST["skills"]) ? implode(", ", array_map('sanitise_input', $_POST["skills"]))
     $otherSkills = sanitise_input($_POST['otherSkillsText']);
 
     // Validate Form Data
@@ -181,10 +181,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Connect to database
     $conn = mysqli_connect($host, $user, $password, $database);
     if (!$conn) {
-        die("Connectfion failed: " . mysqli_connect_error());
+        echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
     }
 
     // Convert skills array to a string
+    $skills = isset($_POST["skills"])
     $skills_string = '';
     $skills_count = count($skills);
 
