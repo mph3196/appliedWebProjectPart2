@@ -1,4 +1,8 @@
 <?php
+// NOTE: Incorporated work referenced to https://www.w3schools.com/php/
+// Jonathon Taylor: Altered from interview, feedback was to simplify and minimise
+// I incorporated arrays and moved queries out of loops and now only use 4 queries instead of my original 13 
+
 // Define Specific Page Variables
 $currentPage = 'jobs'; 
 $pageTitle = 'JSM Jobs Applications Page'; 
@@ -14,6 +18,7 @@ require_once 'settings.php';
 
 // Disable MySQLi exceptions
 mysqli_report(MYSQLI_REPORT_OFF);
+
 // Establish connection to MySQL database
 $conn = @mysqli_connect($host, $user, $password, $database);
 
@@ -46,15 +51,18 @@ $pref_result = mysqli_query($conn, $sql_pref);
 
 $responsibilities = []; 
 while ($row = mysqli_fetch_assoc($resp_result)) {
-    $responsibilities[$row['RefNo']][] = $row['Description']; }
+    $responsibilities[$row['RefNo']]
+    [] = $row['Description']; }
 
 $essentials = []; 
 while ($row = mysqli_fetch_assoc($ess_result)) {
-    $essentials[$row['RefNo']][] = $row['Description']; }
+    $essentials[$row['RefNo']]
+    [] = $row['Description']; }
 
 $preferables = []; 
 while ($row = mysqli_fetch_assoc($pref_result)) {
-    $preferables[$row['RefNo']][] = $row['Description']; }
+    $preferables[$row['RefNo']]
+    [] = $row['Description']; }
 ?>
 
 <aside> 
@@ -160,5 +168,4 @@ mysqli_close($conn); // Close Database Connection
 
 include 'footer.inc'; 
 
-// NOTE: Incorporated work referenced to https://www.w3schools.com/php/
 ?>
