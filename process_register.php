@@ -61,24 +61,18 @@ $stmt->bind_param("sss",
                   $password_hash);
 
 // Tries to save the data in the SQL table
-if ($stmt->execute()) {
-    // If data is saved sucessfully redirects user to login page
-    header('Location: login.php'); 
+try {
+    $stmt->execute();
+    // Success
+    header('Location: login.php');
     exit;
-
-} else {
-    // If process failed
-
-    // Check if the specific error code means Duplicate Entry (1062 in MySQL)
-    if ($conn->errno === 1062) {
-        // If the username is already taken redirects the user back to register page with an error message
+} catch (mysqli_sql_exception $e) {
+    // Check for duplicate entry
+    if ($e->getCode() === 1062) {
         header('Location: register.php?error=Username already taken');
         exit;
-    
-        // All other database errors
     } else {
-        // Stops the scrpit and displays error message
-        die("Database execute error: " . $conn->error . " (Error Code: " . $conn->errno . ")");
+        die("Database execute error: " . $e->getMessage() . " (Error Code: " . $e->getCode() . ")");
     }
 }
 ?>

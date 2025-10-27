@@ -1,139 +1,300 @@
 <?php
-// Checks whether a session has been started
+// Check if a PHP session has not been started yet
 if (session_status() == PHP_SESSION_NONE) {
-    // Starts a session if none
+    // Start a new session if no session exists
     session_start();
 }
 
-// Check if the user is exactly admin and is the one logged in
+// Verify if user is logged in and has exactly 'Admin' username
 if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'Admin') {
-    // If authorization fails(if user is not admin) the user is redirected to login page with an error
+    // Redirect unauthorized users to login page with access denied error
     header('Location: login.php?error=Access denied. Administrator privileges required.');
-    exit;
-}
-// Includes settigs file
-require_once "settings.php";
-// Attempts to connect to the database
-$conn = mysqli_connect($host, $user, $password, $database);
-// Checks for any connection failure from the database
-if (!$conn) {
-    // If connection fails and error message is displayed
-    echo "<p>Unable to connect to the database.</p>";
+    // Stop script execution after redirect
     exit;
 }
 
-// Messages developed by GenAI GPT5
+// Include database connection settings file
+require_once "settings.php";
+// Establish connection to MySQL database using settings
+$conn = mysqli_connect($host, $user, $password, $database);
+// Check if database connection failed
+if (!$conn) {
+    // Display error message if connection fails
+    echo "<p>Unable to connect to the database.</p>";
+    // Stop script execution if no database connection
+    exit;
+}
+
+// Handle First Name Search functionality
 if (
+    // Check if user is logged in as Admin
     isset($_SESSION['username']) &&
     $_SESSION['username'] === 'Admin' &&
-    $_SERVER['REQUEST_METHOD'] === 'POST' &&
-    isset($_POST['action']) && $_POST['action'] === 'delete_by_refno' // Check for dedicated delete action
+    // Verify request method is GET
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    // Check if search action is specified for first name
+    isset($_GET['action']) && $_GET['action'] === 'search_firstname'
 ) {
-    // Get the Reference Number from the post data
-    $refDelete = ($_POST['ref_delete'] ?? '');
-    // Default message class developed by GENAI GPT5 
-    $messageClass = 'error'; // Default message class
+    // Get first name search term from GET parameters with null coalescing as fallback
+    $firstname = ($_GET['search_firstname'] ?? '');
+    
+    // Check if search term is not empty
+    if (!empty($firstname)) {
+        // Store search term in session for persistence
+        $_SESSION['search_firstname'] = $firstname;
+    } else {
+        // Remove search term from session if empty
+        unset($_SESSION['search_firstname']);
+    }
+    
+    // Redirect back to current page to avoid form resubmission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
+    exit;
+}
 
+// Handle Last Name Search functionality
+if (
+    // Check if user is logged in as Admin
+    isset($_SESSION['username']) &&
+    $_SESSION['username'] === 'Admin' &&
+    // Verify request method is GET
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    // Check if search action is specified for last name
+    isset($_GET['action']) && $_GET['action'] === 'search_lastname'
+) {
+    // Get last name search term from GET parameters with null coalescing as fallback
+    $lastname = ($_GET['search_lastname'] ?? '');
+    
+    // Check if search term is not empty
+    if (!empty($lastname)) {
+        // Store search term in session for persistence
+        $_SESSION['search_lastname'] = $lastname;
+    } else {
+        // Remove search term from session if empty
+        unset($_SESSION['search_lastname']);
+    }
+    
+    // Redirect back to current page to avoid form resubmission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
+    exit;
+}
+
+// Handle Reference Number Search functionality
+if (
+    // Check if user is logged in as Admin
+    isset($_SESSION['username']) &&
+    $_SESSION['username'] === 'Admin' &&
+    // Verify request method is GET
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    // Check if search action is specified for reference number
+    isset($_GET['action']) && $_GET['action'] === 'search_refno'
+) {
+    // Get reference number search term from GET parameters with null coalescing as fallback
+    $refno = ($_GET['search_refno'] ?? '');
+    
+    // Check if search term is not empty
+    if (!empty($refno)) {
+        // Store search term in session for persistence
+        $_SESSION['search_refno'] = $refno;
+    } else {
+        // Remove search term from session if empty
+        unset($_SESSION['search_refno']);
+    }
+    
+    // Redirect back to current page to avoid form resubmission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
+    exit;
+}
+
+// Handle Sort functionality for table columns
+if (
+    // Check if user is logged in as Admin
+    isset($_SESSION['username']) &&
+    $_SESSION['username'] === 'Admin' &&
+    // Verify request method is GET
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    // Check if sort action is specified
+    isset($_GET['action']) && $_GET['action'] === 'sort'
+) {
+    // Get sort field from GET parameters, default to 'RefNo' if not specified
+    $sort_field = ($_GET['sort_field'] ?? 'RefNo');
+    
+    // Check if sort field is not empty
+    if (!empty($sort_field)) {
+        // Store sort preference in session for persistence
+        $_SESSION['sort_field'] = $sort_field;
+    }
+    
+    // Redirect back to current page to apply sorting
+    header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
+    exit;
+}
+
+// Handle Clear Search functionality
+if (
+    // Check if user is logged in as Admin
+    isset($_SESSION['username']) &&
+    $_SESSION['username'] === 'Admin' &&
+    // Verify request method is GET
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    // Check if clear search action is specified
+    isset($_GET['action']) && $_GET['action'] === 'clear_search'
+) {
+    // Remove first name search filter from session
+    unset($_SESSION['search_firstname']);
+    // Remove last name search filter from session
+    unset($_SESSION['search_lastname']);
+    // Remove reference number search filter from session
+    unset($_SESSION['search_refno']);
+    
+    // Redirect back to current page with cleared searches
+    header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
+    exit;
+}
+
+// Handle Delete EOI by Reference Number functionality
+if (
+    // Check if user is logged in as Admin
+    isset($_SESSION['username']) &&
+    $_SESSION['username'] === 'Admin' &&
+    // Verify request method is POST
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    // Check if delete action is specified
+    isset($_POST['action']) && $_POST['action'] === 'delete_by_refno'
+) {
+    // Get reference number to delete from POST data
+    $refDelete = ($_POST['ref_delete'] ?? '');
+    // Set default message class to error (will change to success if operation succeeds)
+    $messageClass = 'error';
+
+    // Check if reference number is provided
     if (!empty($refDelete)) {
-        // A parameterised SQL statement to delete the EOI by RefNo
+        // Prepare parameterized SQL statement to prevent SQL injection
         $stmt = mysqli_prepare($conn, "DELETE FROM eoi WHERE RefNo=?");
-        // Bind the RefNo parameter to the statement
+        // Bind the reference number parameter to the prepared statement
         mysqli_stmt_bind_param($stmt, "s", $refDelete); 
-        // Execute statement
+        // Execute the prepared statement
         mysqli_stmt_execute($stmt);
-        // Check if a row was affected (deleted)
+        // Check if any rows were affected (deleted)
         if (mysqli_stmt_affected_rows($stmt) > 0) {
+            // Set success message if deletion was successful
             $_SESSION['message'] = "EOI with Reference Number **$refDelete** deleted successfully.";
+            // Change message class to success for green styling
             $messageClass = 'success';
         } else {
+            // Set error message if no EOI was found with that reference number
             $_SESSION['message'] = "Error: EOI with Reference Number **$refDelete** not found.";
         }
-        // Close statement
+        // Close the prepared statement to free resources
         mysqli_stmt_close($stmt);
     } else {
-         $_SESSION['message'] = "Error: Please provide a valid Reference Number for deletion.";
+        // Set error message if reference number was empty
+        $_SESSION['message'] = "Error: Please provide a valid Reference Number for deletion.";
     }
-    // Store the message class in session for styling after redirect
+    // Store message class in session for styling after redirect
     $_SESSION['message_class'] = $messageClass;
-    // Redirect back to the same page
+    // Redirect back to current page to avoid form resubmission
     header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
     exit;
 }
 
-// // Check for admin role, 'Admin' username, and a form submission (POST request)
-// Messages developed by GenAI GPT5
+// Handle Status Update by Reference Number functionality
 if (
+    // Check if user is logged in as Admin
     isset($_SESSION['username']) &&
     $_SESSION['username'] === 'Admin' &&
-    $_SERVER['REQUEST_METHOD'] === 'POST'
+    // Verify request method is POST
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    // Check if update status action is specified
+    isset($_POST['action']) && $_POST['action'] === 'update_status'
 ) {
-    $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-    // Get the new status from the post data
+    // Get reference number from POST data
+    $refNo = $_POST['refno'] ?? '';
+    // Get new status value from POST data
     $status = $_POST['status'] ?? '';
-    $messageClass = 'error'; // Default message class
+    // Set default message class to error
+    $messageClass = 'error';
 
-    // Check if ID is valid (greater than 0) and the status is one of the 3 allowed values
-    if ($id > 0 && in_array($status, ['New','Current','Final'], true)) {
-        // A paramterised SQL statement to update the status
-        $stmt = mysqli_prepare($conn, "UPDATE eoi SET status=? WHERE id=?");
-        // Bind the status and ID parameters to the statement
-        mysqli_stmt_bind_param($stmt, "si", $status, $id);
-        // Execute statement
+    // Validate that reference number is provided and status is valid
+    if (!empty($refNo) && in_array($status, ['New','Current','Final'], true)) {
+        // Prepare parameterized SQL statement to update status
+        $stmt = mysqli_prepare($conn, "UPDATE eoi SET status=? WHERE RefNo=?");
+        // Bind parameters to the prepared statement (both strings)
+        mysqli_stmt_bind_param($stmt, "ss", $status, $refNo);
+        // Execute the update statement
         mysqli_stmt_execute($stmt);
 
-        // Check if a row was affected (updated)
+        // Check if any rows were affected (updated)
         if (mysqli_stmt_affected_rows($stmt) > 0) {
-            $_SESSION['message'] = "Status for EOI ID **$id** updated to **$status** successfully.";
+            // Set success message if update was successful
+            $_SESSION['message'] = "Status for EOI **$refNo** updated to **$status** successfully.";
+            // Change message class to success for green styling
             $messageClass = 'success';
         } else {
-            $_SESSION['message'] = "Error: Status update failed for EOI ID **$id**.";
+            // Set error message if no EOI was found with that reference number
+            $_SESSION['message'] = "Error: Status update failed for EOI **$refNo**.";
         }
-        // Close statement
+        // Close the prepared statement to free resources
         mysqli_stmt_close($stmt);
     } else {
-        $_SESSION['message'] = "Error: Invalid EOI ID or status provided.";
+        // Set error message if validation failed
+        $_SESSION['message'] = "Error: Invalid Reference Number or status provided.";
     }
-    // Redirect back to the same page
-    header("Location: " . $_SERVER['PHP_SELF']); // avoid re-submit on refresh
+    // Redirect back to current page to avoid form resubmission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    // Stop script execution after redirect
     exit;
 }
 
-
-// Messages box developed by GenAI GPT5
+// Display message box if there is a session message
 if (isset($_SESSION['message'])) {
+    // Get message class from session or default to 'success'
     $class = $_SESSION['message_class'] ?? 'success';
+    // Remove markdown-style bold formatting from message
     $displayMessage = str_replace('**','', $_SESSION['message']); 
 
+    // Output the message box with appropriate CSS class
     echo "<p class='message-box {$class}'>{$displayMessage}</p>";
+    // Remove message from session after displaying to prevent re-display
     unset($_SESSION['message']);
+    // Remove message class from session after displaying
     unset($_SESSION['message_class']);
 }
 
+// Set current page identifier for navigation highlighting
 $currentPage = 'manage';
+// Set page title for browser tab
 $pageTitle = 'JSM Manage Page';
+// Set page description for SEO
 $pageDescription = 'Manage page for JSM website';
+// Set page heading for content area
 $pageHeading = 'Manage EOIs - HR Manager';
 
+// Include header file for consistent page header
 include 'header.inc';
+// Include navigation file for consistent menu
 include 'nav.inc';
 ?>
 
-<!---Styles generated by GPT5-->
+<!-- CSS Styles for the management interface -->
 <style>
     body {
         font-family: Arial, sans-serif;
         background-color: #f4f7f6;
-        overflow-x: hidden; /* <---  PREVENT FULL-PAGE SCROLL */
-        }
+        overflow-x: hidden;
+    }
     .table-responsive {
-        /* THIS PROPERTY enables horizontal sliding/scrolling */
         overflow-x: auto; 
-        margin-top: 20px;
+        margin-top: 10px;
     }
     .eoi-table {
-        /* width: 100% ensures it fills the container up to max-width */
         width: 100%; 
-        /* min-width forces a scrollbar if the screen is smaller than this width */
         min-width: 1200px; 
         border-collapse: collapse;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -143,8 +304,7 @@ include 'nav.inc';
         padding: 12px 10px;
         text-align: left;
         font-size: 0.9em;
-        /* white-space: nowrap keeps all cells on one line, enforcing the scroll */
-        white-space: nowrap; 
+        white-space: nowrap;
     }
     .eoi-table th {
         background-color: #233260ff;
@@ -159,6 +319,7 @@ include 'nav.inc';
         background-color: #f0f8ff;
     }
     .status-form {
+        display: flex;
         align-items: center;
         gap: 5px;
     }
@@ -180,15 +341,12 @@ include 'nav.inc';
     input[type="submit"]:hover {
         background-color: #45a049;
     }
-.delete-reference {
+    .delete-reference {
         border: 1px solid #f44336;
         padding: 15px;
         margin-bottom: 20px;
         background-color: #ffebee;
         border-radius: 5px;
-        display: flex;
-        gap: 10px;
-        align-items: center;
     }
     .delete-reference label {
         font-weight: bold;
@@ -199,6 +357,7 @@ include 'nav.inc';
         border: 1px solid #f44336;
         border-radius: 4px;
         min-width: 150px;
+        margin: 0 10px;
     }
     .delete-reference input[type="submit"] {
         background-color: #f44336;
@@ -207,34 +366,44 @@ include 'nav.inc';
     .delete-reference input[type="submit"]:hover {
         background-color: #d32f2f;
     }
-    .search {
-        border: 1px solid #f44336;
+    .search-form {
+        border: 1px solid #1976d2;
         padding: 15px;
         margin-bottom: 20px;
-        background-color: #ffebee;
+        background-color: #e3f2fd;
         border-radius: 5px;
-        display: flex;
-        gap: 10px;
-        align-items: center;
     }
-    .search label {
+    .search-form label {
         font-weight: bold;
-        color: #d32f2f;
+        color: #233260ff;
     }
-    .search input[type="text"] {
-        padding: 8px;
-        border: 1px solid #f44336;
+    .search-form input[type="text"] {
+        padding: 8px 12px;
+        border: 1px solid #1976d2;
         border-radius: 4px;
-        min-width: 150px;
+        min-width: 200px;
+        margin: 0 10px;
+        transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .search input[type="submit"] {
-        background-color: #f44336;
+    .search-form input[type="text"]:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        outline: none;
+    }
+    .search-form input[type="submit"] {
+        background-color: #1976d2;
+        color: white;
         padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-weight: bold;
     }
-    .search input[type="submit"]:hover {
-        background-color: #d32f2f;
+    .search-form input[type="submit"]:hover {
+        background-color: #1565c0;
     }
-    #message-box {
+    .message-box {
         padding: 10px;
         margin-bottom: 15px;
         border-radius: 4px;
@@ -249,183 +418,256 @@ include 'nav.inc';
         color: #721c24;
         border: 1px solid #f5c6cb;
     }
-    .search {
-    border: 1px solid #1976d2;
-    padding: 15px;
-    margin-bottom: 20px;
-    background-color: #e3f2fd;
-    border-radius: 5px;
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 15px;
-    align-items: center;
-}
-.search label {
-    font-weight: bold;
-    color: #233260ff;
-    margin-right: 5px; 
-}
-.search input[type="text"] {
-    padding: 8px 12px;
-    border: 1px solid #1976d2;
-    border-radius: 4px;
-    min-width: 150px;
-    flex-grow: 1;
-    max-width: 250px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-.search input[type="text"]:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-    outline: none;
-}
-.search button[type="submit"] {
-
-    background-color: #1976d2;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
-    font-weight: bold;
-}
-.search button[type="submit"]:hover {
-    background-color: #1565c0;
-    transform: translateY(-1px);
-}
+    .sort-section {
+        margin-bottom: 10px;
+        padding: 8px 0;
+        background-color: transparent;
+        display: inline-block;
+    }
+    .sort-section label {
+        font-weight: bold;
+        color: #233260ff;
+        font-size: 0.9em;
+        margin-right: 8px;
+    }
+    .sort-section select {
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin: 0 8px;
+        font-size: 0.85em;
+        min-width: 140px;
+    }
+    .sort-section input[type="submit"] {
+        background-color: #233260ff;
+        color: white;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85em;
+    }
+    .sort-section input[type="submit"]:hover {
+        background-color: #1a2747;
+    }
+    .clear-search {
+        margin-bottom: 20px;
+    }
+    .clear-search input[type="submit"] {
+        background-color: #ff9800;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .clear-search input[type="submit"]:hover {
+        background-color: #f57c00;
+    }
 </style>
+
+<!-- Main content area of the page -->
 <div class="content-area">
+    <!-- Page header with welcome message -->
     <header style="display:flex; justify-content:space-between; align-items:center; background:#1976d2; color:white; padding:1em;">
         <h2 style="margin:0;">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></h2>
     </header>
+    <!-- Page introduction section -->
     <div style="padding-bottom: 20px;">
-    <h3><?php echo $pageHeading; ?></h3>
-    <p>This panel is for administrators to view and manage all Expressions of Interest (EOIs).</p>
+        <h3><?php echo $pageHeading; ?></h3>
+        <p>This panel is for administrators to view and manage all Expressions of Interest (EOIs).</p>
     </div>
-<div class="delete-reference">
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" 
-          onsubmit="return confirm('WARNING: This action is permanent. Are you absolutely sure you want to delete the EOI with the entered Reference Number?');">
-        <label for="refno_input">Delete EOI by Reference Number:</label>
-        <input type="text" id="refno_input" name="ref_delete" placeholder="e.g., JSM001" required> 
-        <input type="hidden" name="action" value="delete_by_refno"> 
-        <input type="submit" value="Delete EOI">
-    </form>
-</div>
-<div class="search">
-    <form method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
-        <label for="refno_input">First Name Search:</label>
-        <input type="text" id="firstname_search" name="onesearch" 
-        value="<?php echo isset($_GET['search_firstname']) ? htmlspecialchars($_GET['search_firstname']) : ''; ?>" placeholder="e.g., John">
 
-        <label for="lastname_search">Last Name Search:</label>
-        <input type="text" id="lastname_search" name="search_lastname" 
-        value="<?php echo isset($_GET['search_lastname']) ? htmlspecialchars($_GET['search_lastname']) : ''; ?>" placeholder="e.g., Doe">
+    <!-- Delete EOI by Reference Number Section -->
+    <div class="delete-reference">
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <label for="refno_input">Delete EOI by Reference Number:</label>
+            <input type="text" id="refno_input" name="ref_delete" placeholder="e.g., JSM001" required> 
+            <input type="hidden" name="action" value="delete_by_refno"> 
+            <input type="submit" value="Delete EOI">
+        </form>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-</div>
+    <!-- Search by Name Section -->
+    <div class="search-form">
+        <form method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <label for="firstname_search">First Name:</label>
+            <input type="text" name="search_firstname" id="firstname_search" placeholder="e.g. John"
+            value="<?php echo isset($_SESSION['search_firstname']) ? htmlspecialchars($_SESSION['search_firstname']) : ''; ?>">
+            <input type="hidden" name="action" value="search_firstname">
+
+            <label for="lastname_search">Last Name:</label>
+            <input type="text" name="search_lastname" id="lastname_search" placeholder="e.g. Doe" 
+            value="<?php echo isset($_SESSION['search_lastname']) ? htmlspecialchars($_SESSION['search_lastname']) : ''; ?>">
+            <input type="hidden" name="action" value="search_lastname">
+            <input type="submit" value="Search">
+        </form>
+    </div>
+
+    <!-- Search by Reference Number Section -->
+    <div class="search-form">
+        <form method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <label for="refno_search">Reference Number:</label>
+            <input type="text" name="search_refno" id="refno_search" placeholder="e.g. JSM001"
+                   value="<?php echo isset($_SESSION['search_refno']) ? htmlspecialchars($_SESSION['search_refno']) : ''; ?>">
+            <input type="hidden" name="action" value="search_refno">
+            <input type="submit" value="Search">
+        </form>
+    </div>
+
+    <!-- Clear All Searches Section -->
+    <div class="clear-search">
+        <form method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="action" value="clear_search">
+            <input type="submit" value="Clear All Searches">
+        </form>
+    </div>
+
+    <!-- Sort Results Section -->
+    <div class="sort-section">
+        <form method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <label for="sort_field">Sort By:</label>
+            <select name="sort_field" id="sort_field">
+                <option value="RefNo" <?php 
+                    // Set 'selected' attribute if RefNo is current sort field
+                    echo (isset($_SESSION['sort_field']) && $_SESSION['sort_field'] == 'RefNo') ? 'selected' : ''; ?>>EOI Reference
+                </option>
+                <option value="LastName" <?php 
+                    // Set 'selected' attribute if LastName is current sort field
+                    echo (isset($_SESSION['sort_field']) && $_SESSION['sort_field'] == 'LastName') ? 'selected' : ''; ?>>Applicant Last Name
+                </option>
+                <option value="Status" <?php 
+                    // Set 'selected' attribute if Status is current sort field
+                    echo (isset($_SESSION['sort_field']) && $_SESSION['sort_field'] == 'Status') ? 'selected' : ''; ?>>Status
+                </option>
+            </select>
+            <input type="hidden" name="action" value="sort">
+            <input type="submit" value="Sort">
+        </form>
+    </div>
 
 <?php
+// Build base SQL query to select all EOI records
+$query = "SELECT * FROM eoi";
+// Initialize array to store WHERE conditions
+$where_conditions = [];
 
-$search_term = '';
-$result = null;
-
-// Check if a first name search term is provided in the GET request
-if (isset($_GET['search_firstname']) && !empty(($_GET['search_firstname']))) {
-    $search_term = trim($_GET['search_firstname']);
-    // Sanitize the search term for LIKE query
-    $search_like = "%" . $search_term . "%";
-
-    // SQL query with WHERE clause, ordered by RefNo
-    // NOTE: Using prepared statements for security against SQL Injection
-    $query = "SELECT * FROM eoi WHERE FirstName LIKE ? ORDER BY RefNo";
-    
-    $stmt = mysqli_prepare($conn, $query);
-    // Bind the search parameter (s for string)
-    mysqli_stmt_bind_param($stmt, "s", $search_like);
-    
-    // Execute the statement
-    mysqli_stmt_execute($stmt);
-    
-    // Get the result set from the prepared statement
-    $result = mysqli_stmt_get_result($stmt);
-    
+// Check if first name search filter is active in session
+if (isset($_SESSION['search_firstname']) && !empty($_SESSION['search_firstname'])) {
+    // Escape first name search term to prevent SQL injection
+    $FirstName = mysqli_real_escape_string($conn, $_SESSION['search_firstname']);
+    // Add LIKE condition for first name search
+    $where_conditions[] = "FirstName LIKE '%$FirstName%'";
 }
-// SQL query to select all data from the 'eoi' table, ordered by Reference Number
-$query = "SELECT * FROM eoi ORDER BY RefNo";
-// Store in result and executes the query
+
+// Check if last name search filter is active in session
+if (isset($_SESSION['search_lastname']) && !empty($_SESSION['search_lastname'])) {
+    // Escape last name search term to prevent SQL injection
+    $LastName = mysqli_real_escape_string($conn, $_SESSION['search_lastname']);
+    // Add LIKE condition for last name search
+    $where_conditions[] = "LastName LIKE '%$LastName%'";
+}
+
+// Check if reference number search filter is active in session
+if (isset($_SESSION['search_refno']) && !empty($_SESSION['search_refno'])) {
+    // Escape reference number search term to prevent SQL injection
+    $RefNo = mysqli_real_escape_string($conn, $_SESSION['search_refno']);
+    // Add LIKE condition for reference number search
+    $where_conditions[] = "RefNo LIKE '%$RefNo%'";
+}
+
+// Check if any search conditions were added
+if (!empty($where_conditions)) {
+    // Append WHERE clause with all conditions joined by AND
+    $query .= " WHERE " . implode(" AND ", $where_conditions);
+}
+
+// Get sort field from session or default to 'RefNo'
+$sortField = isset($_SESSION['sort_field']) ? $_SESSION['sort_field'] : 'RefNo';
+// Append ORDER BY clause to SQL query
+$query .= " ORDER BY $sortField";
+
+// Execute the SQL query against the database
 $result = mysqli_query($conn, $query);
 
-// Checks if the query execution failed
+// Check if query execution failed
 if (!$result) {
-    // If query fauled, error is displayed
+    // Display database error message
     echo "<p>Error in query: " . mysqli_error($conn) . "</p>";
 }
 
-// Checks if query was successful and atleast returned one row of data 
+// Check if query returned any rows
 if ($result && mysqli_num_rows($result) > 0) {
-        // Table Responsive class
-        echo "<div class='table-responsive'>";
-        // EOI table class
-        echo "<table class='eoi-table'>";
-        // Table header row with its column names
-        echo "<tr><th>RefNo</th><th>ID</th><th>ApplyDate</th><th>FirstName</th><th>LastName</th><th>DOB</th><th>Gender</th><th>Address</th><th>Suburb</th><th>Email</th><th>Phone.No</th><th>Skills</th><th>Other Skills</th><th>Status</th></tr>";
-        // Loop each row of the query result
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['RefNo']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['ID']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['ApplyDate']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['FirstName']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['LastName']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['DOB']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['Gender']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['Address']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['Suburb']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['Email']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['PhoneNo']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['Skills']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['OtherSkills']) . "</td>";
-            // Start of the table data for EOI status
-            echo "<td>";
-            // Get the current status for the row
-            $currentStatus = htmlspecialchars($row['Status'] ?? '');
-            // Form for status update (using post to the current page)
-            echo '<form method="post" action="' . htmlspecialchars($_SERVER['PHP_SELF']). '" class="status-form" style="display: inline-flex;">';
-            // Pass the EOI ID to the post request
-            echo '<input type="hidden" name="id" value="' . (int)$row['ID'] . '">';
-            // Status selelction dropdown menu
-            echo '<select name="status">';
-            // Option for New, selected if it matches the current status
-            echo '<option value="New"' . ($currentStatus == 'New' ? ' selected' : '') . '>New</option>';
-            // Option for Current, selected if it matches the current status
-            echo '<option value="Current"' . ($currentStatus == 'Current' ? ' selected' : '') . '>Current</option>';
-            // Option for New, selected if it matches the current status
-            echo '<option value="Final"' . ($currentStatus == 'Final' ? ' selected' : '') . '>Final</option>';
-            // Select tag closed
-            echo '</select>';
-            // Button to save the new status
-            echo '<input type="submit" value="Save">';
-            // Form tag closed
-            echo '</form>';
-            // Status table data tag closed
-            echo "</td>";
-            // Table row closed
-            echo "</tr>";
-        }
+    // Start responsive table container
+    echo "<div class='table-responsive'>";
+    // Start EOI table with headers
+    echo "<table class='eoi-table'>";
+    // Output table header row with column names
+    echo "<tr><th>RefNo</th><th>ID</th><th>ApplyDate</th><th>FirstName</th><th>LastName</th><th>DOB</th><th>Gender</th><th>Address</th><th>Suburb</th><th>Email</th><th>Phone.No</th><th>Skills</th><th>Other Skills</th><th>Status</th></tr>";
+    
+    // Loop through each row in the result set
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Start table row for current EOI record
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($row['RefNo']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['ID']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['ApplyDate']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['FirstName']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['LastName']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['DOB']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['Gender']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['Address']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['Suburb']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['Email']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['PhoneNo']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['Skills']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['OtherSkills']) . "</td>";
+        // Start Status cell which contains the update form
+        echo "<td>";
+        // Get current status value for this row and escape for output
+        $currentStatus = htmlspecialchars($row['Status'] ?? '');
+        // Start form for status update with POST method
+        echo '<form method="post" action="' . htmlspecialchars($_SERVER['PHP_SELF']). '" class="status-form">';
+        // Hidden input to pass reference number for identification
+        echo '<input type="hidden" name="refno" value="' . htmlspecialchars($row['RefNo']) . '">';
+        // Hidden input to specify the action type
+        echo '<input type="hidden" name="action" value="update_status">';
+        // Start status selection dropdown
+        echo '<select name="status">';
+        // Option for New status, selected if current status is New
+        echo '<option value="New"' . ($currentStatus == 'New' ? ' selected' : '') . '>New</option>';
+        // Option for Current status, selected if current status is Current
+        echo '<option value="Current"' . ($currentStatus == 'Current' ? ' selected' : '') . '>Current</option>';
+        // Option for Final status, selected if current status is Final
+        echo '<option value="Final"' . ($currentStatus == 'Final' ? ' selected' : '') . '>Final</option>';
+        // Close status selection dropdown
+        echo '</select>';
+        // Submit button to save status changes
+        echo '<input type="submit" value="Save">';
+        // Close the status update form
+        echo '</form>';
+        // Close the Status cell
+        echo "</td>";
+        // Close the table row
+        echo "</tr>";
+    }
+    // Close the EOI table
     echo "</table>";
+    // Close the responsive table container
+    echo "</div>";
 } else {
-    //if there are no EOIs found in the table
+    // Display message when no EOIs are found
     echo "<p>There are no EOIs to display.</p>";
 }
-// If the query was successful (returned the list of data)
+
+// Free the result set memory if result exists
 if ($result) {
-    // Comoputer memory free up that was used to hold the list of EOIs
     mysqli_free_result($result);
 }
-// Close the datatbase connection
+// Close the database connection
 mysqli_close($conn);
 ?>
+
 </div>
+<!-- Include footer file for consistent page footer -->
 <?php include 'footer.inc'; ?>

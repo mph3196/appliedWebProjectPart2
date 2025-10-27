@@ -13,8 +13,20 @@ include 'nav.inc';
 
 // includes settings file
 require "settings.php";
-// Attempts to connect to the database
-$conn = mysqli_connect($host, $user, $password, $database); 
+// Disable MySQLi exceptions
+mysqli_report(MYSQLI_REPORT_OFF);
+// Establish connection to MySQL database
+$conn = @mysqli_connect($host, $user, $password, $database);
+
+// Check connection
+if (!$conn) {
+    echo "<div class='container'>";
+    echo "<h1>Database Connection Error</h1>";
+    echo "<p>Sorry, we are unable to retrieve the login page. Please try again later.</p>";
+    echo "<p>Debug info: " . mysqli_connect_error() . "</p>";
+    include 'footer.inc';
+    exit;
+}
 
 // Checks if the connection failed
 if (!$conn) {

@@ -1,11 +1,40 @@
 <?php
+// Start the session
 session_start();
+require_once 'settings.php';
+
+// Page meta settings
+$currentPage = 'apply';
+$pageTitle = 'JSM University Job Applications';
+$pageDescription = 'Applications page for JSM University';
+$pageHeading = 'Apply';
+
+// Include header and nav bar
+include 'header.inc';
+include 'nav.inc';
+
+// Disable MySQLi exceptions
+mysqli_report(MYSQLI_REPORT_OFF);
+// Establish connection to MySQL database
+$conn = @mysqli_connect($host, $user, $password, $database);
+
+// Check connection
+if (!$conn) {
+    echo "<div class='container'>";
+    echo "<h1>Database Connection Error</h1>";
+    echo "<p>Sorry, we are unable to take applications at this time. Please try again later.</p>";
+    echo "<p>Debug info: " . mysqli_connect_error() . "</p>";
+    include 'footer.inc';
+    exit;
+}
 
 if (!isset($_SESSION['user_id'])) {
     // If the user is not logged in, redirected to the login page
     header('Location: login.php?error=You must log in to submit an application.');
     exit;
 }
+
+$userId = $_SESSION['user_id'];
 
 // Check for redirect from jobs page
 if (isset($_GET['refNo'])) {
@@ -16,18 +45,22 @@ if (isset($_GET['refNo'])) {
     $_SESSION['form_data']['refNo'] = $_GET['refNo'];
 }
 
-$userId = $_SESSION['user_id'];
-$currentPage = 'apply';
-$pageTitle = 'JSM University Job Applications';
-$pageDescription = 'Applications page for JSM University';
-$pageHeading = 'Apply';
+
+// Get the user's name
+$sql = "SELECT name FROM User WHERE id = $userId";
+$result = mysqli_query($conn, $sql);
+
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $name = $row['name'];
+} else {
+    $name = "";
+}
 
 // Get form data from session if it exists
 $form_data = isset($_SESSION['form_data']) ? $_SESSION['form_data'] : array();
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 
-include 'header.inc';
-include 'nav.inc';
 ?>
 
 <div class="container" id="apply-container">
@@ -60,8 +93,9 @@ include 'nav.inc';
             <div class="two-column">
                 <div class="form-group">
                     <label for="firstName">First Name <span class="required">*</span></label>
-                    <input type="text" id="firstName" name="firstName" title="Enter your first name, maximum 20 letters"
-                    value="<?php echo isset($form_data['firstName']) ? htmlspecialchars($form_data['firstName']) : ''; ?>">
+                    <input type="text" id="firstName" name="firstName" 
+                        title="Enter your first name, maximum 20 letters"
+                        value="<?php echo htmlspecialchars($form_data['firstName'] ?? $name ?? ''); ?>">
                 </div>
                 
                 <div class="form-group">

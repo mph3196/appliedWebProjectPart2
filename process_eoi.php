@@ -3,6 +3,11 @@ session_start();
 $userId = $_SESSION['user_id'];
 require_once 'settings.php';
 
+// Prevent direct access
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: apply.php');
+    exit;
+}
 
 // Sanitise script courtesy of Atie Kia (https://github.com/atieasadikia/COS10026-S2-2025/blob/main/lecture07/form.php)
 function sanitise_input($data){
@@ -28,7 +33,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $state = sanitise_input($_POST["state"]);
     $email = sanitise_input($_POST["email"]);
     $phone = sanitise_input($_POST["phone"]);
-    $skills = isset($_POST["skills"]) ? $_POST["skills"] : [];
+    $skills = '';
+    if (isset($_POST['skills']) && is_array($_POST['skills'])) {
+        $skills = implode(", ", array_map('sanitise_input', $_POST['skills']));
+    }
     $otherSkills = sanitise_input($_POST['otherSkillsText']);
 
     // Validate Form Data
@@ -181,18 +189,39 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Connect to database
     $conn = mysqli_connect($host, $user, $password, $database);
     if (!$conn) {
-        die("Connectfion failed: " . mysqli_connect_error());
+        echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
+        exit;
     }
 
-    // Convert skills array to a string
-    $skills_string = '';
-    $skills_count = count($skills);
+    // Create eoi table if it does not exist
+    $sql_create_eoi = "
+    CREATE TABLE IF NOT EXISTS `eoi` (
+    EOIno INT NOT NULL AUTO_INCREMENT,
+    RefNo VARCHAR(5) NOT NULL,
+    ID INT NOT NULL,
+    ApplyDate DATE NOT NULL DEFAULT CURDATE(),
+    FirstName VARCHAR(20) NOT NULL,
+    LastName VARCHAR(20) NOT NULL,
+    DOB DATE NOT NULL,
+    Gender ENUM('Male','Female','Other','Prefer not to say') NOT NULL,
+    Address VARCHAR(40) NOT NULL,
+    Suburb VARCHAR(40) NOT NULL,
+    Postcode INT(11) NOT NULL,
+    State ENUM('VIC','NSW','QLD','WA','SA','TAS','NT','ACT') NOT NULL,
+    Email VARCHAR(40) NOT NULL,
+    PhoneNo VARCHAR(12) NOT NULL,
+    Skills VARCHAR(128) DEFAULT NULL,
+    OtherSkills VARCHAR(1024) DEFAULT NULL,
+    Status ENUM('New','Current','Final') DEFAULT 'New',
+    PRIMARY KEY (`EOIno`),
+    FOREIGN KEY (`RefNo`) REFERENCES `jobs`(`RefNo`) ON DELETE CASCADE,
+    FOREIGN KEY (`ID`) REFERENCES `user`(`id`) ON DELETE CASCADE
+    );
+    ";
 
-    for ($i = 0; $i < $skills_count; $i++) {
-        if ($i > 0) {
-            $skills_string .= ', ';
-        }
-        $skills_string .= $skills[$i];
+    if (!mysqli_query($conn, $sql_create_eoi)) {
+        echo "<p>Error creating EOI table: " . mysqli_error($conn) . "</p>";
+        exit;
     }
 
     // Escape all string variables for SQL safety
@@ -205,7 +234,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $state = mysqli_real_escape_string($conn, $state);
     $email = mysqli_real_escape_string($conn, $email);
     $phone = mysqli_real_escape_string($conn, $phone);
-    $skills_string = mysqli_real_escape_string($conn, $skills_string);
+    $skills = mysqli_real_escape_string($conn, $skills);
     $otherSkills = mysqli_real_escape_string($conn, $otherSkills);
     // Convert postcode to integer
     $postcode = (int)$postcode;
@@ -215,14 +244,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $sql = "INSERT INTO eoi(RefNo, ID, FirstName, LastName, DOB, Gender, Address, 
         Suburb, Postcode, State, Email, PhoneNo, Skills, OtherSkills, Status) 
         VALUES ('$refNo', $userId, '$firstName', '$lastName', '$dob', '$gender', 
-        '$address', '$suburb', $postcode, '$state', '$email', '$phone', '$skills_string', '$otherSkills', 'New')";
+        '$address', '$suburb', $postcode, '$state', '$email', '$phone', '$skills', '$otherSkills', 'New')";
 
     // Execute the query
     if (mysqli_query($conn, $sql)) {
-        // If successful, clear session and redirect
+        // Get the auto-generated EOInumber
+        $eoiNumber = mysqli_insert_id($conn);
+
+        // Store EOInumber in session for confirmation page
+        $_SESSION['last_eoi'] = $eoiNumber;
+
+        // Clear form data and errors
         $_SESSION['form_data'] = array();
         $_SESSION['error'] = '';
-        header('Location: dashboard.php');
+
+        // Redirect to confirmation page
+        header('Location: eoi_confirmation.php');
         exit;
     } else {
         // Database error

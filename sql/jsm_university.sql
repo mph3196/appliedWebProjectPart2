@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 21, 2025 at 09:53 AM
+-- Generation Time: Oct 26, 2025 at 05:26 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,26 +24,40 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `about`
---
-
-CREATE TABLE `about` (
-  `AID` int(11) NOT NULL,
-  `Task` varchar(128) NOT NULL,
-  `Description` varchar(256) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `contribution`
 --
 
 CREATE TABLE `contribution` (
-  `CID` int(11) NOT NULL,
-  `SID` int(11) NOT NULL,
-  `AID` int(11) NOT NULL
+  `ContributionID` int(11) NOT NULL,
+  `TaskID` int(11) NOT NULL,
+  `MemberID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `contribution`
+--
+
+INSERT INTO `contribution` (`ContributionID`, `TaskID`, `MemberID`) VALUES
+(1, 1, 105118283),
+(2, 5, 105118283),
+(3, 6, 105118283),
+(4, 14, 105118283),
+(5, 7, 105118283),
+(6, 8, 105118283),
+(7, 11, 105118283),
+(8, 1, 105920789),
+(9, 2, 105920789),
+(10, 6, 105920789),
+(11, 14, 105920789),
+(12, 12, 105920789),
+(13, 15, 105920789),
+(14, 16, 105920789),
+(15, 1, 106188591),
+(16, 6, 106188591),
+(17, 4, 106188591),
+(18, 14, 106188591),
+(19, 9, 106188591),
+(20, 13, 106188591);
 
 -- --------------------------------------------------------
 
@@ -59,17 +73,26 @@ CREATE TABLE `eoi` (
   `FirstName` varchar(20) NOT NULL,
   `LastName` varchar(20) NOT NULL,
   `DOB` date NOT NULL,
-  `Gender` varchar(2) NOT NULL,
+  `Gender` enum('Male','Female','Other','Prefer not to say') NOT NULL,
   `Address` varchar(40) NOT NULL,
   `Suburb` varchar(40) NOT NULL,
   `Postcode` int(11) NOT NULL,
-  `State` varchar(3) NOT NULL,
+  `State` enum('VIC','NSW','QLD','WA','SA','TAS','NT','ACT') NOT NULL,
   `Email` varchar(40) NOT NULL,
   `PhoneNo` varchar(12) NOT NULL,
   `Skills` varchar(128) DEFAULT NULL,
   `OtherSkills` varchar(1024) DEFAULT NULL,
   `Status` enum('New','Current','Final') DEFAULT 'New'
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `eoi`
+--
+
+INSERT INTO `eoi` (`EOIno`, `RefNo`, `ID`, `ApplyDate`, `FirstName`, `LastName`, `DOB`, `Gender`, `Address`, `Suburb`, `Postcode`, `State`, `Email`, `PhoneNo`, `Skills`, `OtherSkills`, `Status`) VALUES
+(4, 'G03C3', 9, '2025-10-26', 'George', 'Gorilla', '2000-01-01', 'Male', '12 Banana Street', 'Monkeyville', 3123, 'NSW', 'curious@george.com', '0412262627', 'communication, leadership, other', 'Monkey Business', 'New'),
+(5, 'G03A1', 11, '2025-10-26', 'Trevor', 'Revver', '1970-01-01', 'Male', '1 Old Street', 'Oldtown', 3000, 'TAS', 'old@man.com', '0400000001', 'leadership, other', 'Stunt driving', 'New'),
+(6, 'G03B2', 12, '2025-10-26', 'Amanda', 'Bolts', '2001-01-01', 'Female', '1 Beach Road', 'Beaumaris', 3193, 'VIC', 'amanda@amanda.com', '0412987654', 'problemSolving, other', 'Living, laughing, loving', 'New');
 
 -- --------------------------------------------------------
 
@@ -228,17 +251,18 @@ CREATE TABLE `member` (
   `CodingSnack` varchar(30) DEFAULT NULL,
   `HomeTown` varchar(30) DEFAULT NULL,
   `ProgLang` varchar(12) DEFAULT NULL,
-  `FunFact` varchar(256) DEFAULT NULL
+  `FunFact` varchar(256) DEFAULT NULL,
+  `LangCode` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `member`
 --
 
-INSERT INTO `member` (`MemberID`, `UserID`, `FullName`, `Bio`, `FavLanguage`, `FavQuote`, `DreamJob`, `CodingSnack`, `HomeTown`, `ProgLang`, `FunFact`) VALUES
-(105118283, 1, 'Jonathon Taylor', 'Jonathon is a 21 year old male and second year student from Melbourne Australia, \r\n    he is currently pursuing a Bachelors Degree in Computer Science, majoring in Cyber Security', 'Dutch', 'Streef niet naar succes als dat is wat je wilt; \r\n    gewoon doen waar je van houdt en in gelooft en de rest komt vanzelf.', 'Security Engineer', 'Coffee', 'Bairnsdale, Australia', 'C#', 'Train the combat sport of Muay Thai in Thailand'),
-(105920789, 2, 'Shaun Vambe', 'Shaun is a 19 year old male first year student from Melbourne Australia, \r\n    he is currently pursuing a Bachelors Degree in Data Science', 'Portuguese', 'A melhor vingança é ser diferente daquele que causou o dano.', 'Data scientist at a leading finance firm', 'Coffee', 'Melbourne, Australia', 'HTML', 'His favourite Batman comic is Dark Victory.'),
-(106188591, 3, 'Morgan Hopkins', 'Morgan is a 36 year old male first year student from Melbourne, Australia. He is currently pursuing a Bachelors Degree in Data Science', 'Mandarin', '天下萬物都處於徹底的混亂之中;情況非常好', 'Cybernetic Systems Engineer', 'Whisky', 'Chelsea Heights', 'Python', 'Cycled solo across England, Wales and Ireland');
+INSERT INTO `member` (`MemberID`, `UserID`, `FullName`, `Bio`, `FavLanguage`, `FavQuote`, `DreamJob`, `CodingSnack`, `HomeTown`, `ProgLang`, `FunFact`, `LangCode`) VALUES
+(105118283, 1, 'Jonathon Taylor', 'Jonathon is a 21 year old male and second year student from Melbourne Australia, \r\n    he is currently pursuing a Bachelors Degree in Computer Science, majoring in Cyber Security', 'Dutch', 'Streef niet naar succes als dat is wat je wilt; \r\n    gewoon doen waar je van houdt en in gelooft en de rest komt vanzelf.', 'Security Engineer', 'Coffee', 'Bairnsdale, Australia', 'C#', 'Train the combat sport of Muay Thai in Thailand', 'nl'),
+(105920789, 2, 'Shaun Vambe', 'Shaun is a 19 year old male first year student from Melbourne Australia, \r\n    he is currently pursuing a Bachelors Degree in Data Science', 'Portuguese', 'A melhor vingança é ser diferente daquele que causou o dano.', 'Data scientist at a leading finance firm', 'Coffee', 'Melbourne, Australia', 'HTML', 'His favourite Batman comic is Dark Victory.', 'pt-BR'),
+(106188591, 3, 'Morgan Hopkins', 'Morgan is a 36 year old male first year student from Melbourne, Australia. He is currently pursuing a Bachelors Degree in Data Science', 'Mandarin', '天下萬物都處於徹底的混亂之中;情況非常好', 'Cybernetic Systems Engineer', 'Whisky', 'Chelsea Heights', 'Python', 'Cycled solo across England, Wales and Ireland', 'zh-TW');
 
 -- --------------------------------------------------------
 
@@ -265,6 +289,39 @@ INSERT INTO `role` (`RoleID`, `MemberID`, `Description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `task`
+--
+
+CREATE TABLE `task` (
+  `TaskID` int(11) NOT NULL,
+  `Description` varchar(1024) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `task`
+--
+
+INSERT INTO `task` (`TaskID`, `Description`) VALUES
+(1, 'index.html'),
+(2, 'apply.html'),
+(3, 'about.html'),
+(4, 'apply.html'),
+(5, 'jobs.html'),
+(6, 'styles.css'),
+(7, 'Task 1 - Reuse common UI with PHP includes'),
+(8, 'Task 2 - Database settings'),
+(9, 'Task 3 - Create Expression of Interest table and name it eoi'),
+(10, 'Task 4 - Add validated records (process_eoi.php)'),
+(11, 'Task 5 - Jobs table and jobs.php'),
+(12, 'Task 6 - HR manager queries (manage.php)'),
+(13, 'Task 7 - Create about table and update about.php '),
+(14, 'Jira Board'),
+(15, 'dashboard.php'),
+(16, 'register.php');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
@@ -272,47 +329,40 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `username` varchar(128) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
-  `name` varchar(128) DEFAULT NULL,
-  `member` tinyint(1) DEFAULT NULL
+  `name` varchar(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password_hash`, `name`, `member`) VALUES
-(1, 'jtaylor', '$2y$10$kW77vmuDacOofRxIMK9SxeLF/1ePo3JjFUbdw4yBAkYzCDICKbm9G', 'Jonathon', 1),
-(2, 'svambe', '$2y$10$0zacz.ShUcNZ1UN5JSfjSuyXI/2FMc0qaiZXUi7y3hcImysK43Trm', 'Shaun', NULL),
-(3, 'mhopkins', '$2y$10$j8kxqiEo0iQZT5QcwgIY0eRef.D7j29OorAcwewX4hCQufcLr/06m', 'Morgan', NULL),
-(5, 'Admin', '$2y$10$veJddWdhghRjSOkaEVZ7quqHxV4kq8UcI5NVNsVB1DS91Xe23m0xG', 'Administrator', NULL);
-
--- --------------------------------------------------------
+INSERT INTO `user` (`id`, `username`, `password_hash`, `name`) VALUES
+(1, 'jtaylor', '$2y$10$kW77vmuDacOofRxIMK9SxeLF/1ePo3JjFUbdw4yBAkYzCDICKbm9G', 'Jonathon'),
+(2, 'svambe', '$2y$10$0zacz.ShUcNZ1UN5JSfjSuyXI/2FMc0qaiZXUi7y3hcImysK43Trm', 'Shaun'),
+(3, 'mhopkins', '$2y$10$j8kxqiEo0iQZT5QcwgIY0eRef.D7j29OorAcwewX4hCQufcLr/06m', 'Morgan'),
+(5, 'Admin', '$2y$10$veJddWdhghRjSOkaEVZ7quqHxV4kq8UcI5NVNsVB1DS91Xe23m0xG', 'Administrator'),
+(9, 'curious_george', '$2y$10$FMvFj049y53xCzomGf/pBODcQv5PFEdCPYcwlGDd1Sp.eH4W4C.Dy', 'George'),
+(11, 'trev', '$2y$10$CUA0esb.SVWP7/KD6e4ea.h74cGCQmuYcFV3GLXvISir.2MCbmeh.', 'Trevor'),
+(12, 'xx_mandy_xx', '$2y$10$YuGRgunc4jP6SevlCzrtt.HXPbat1y4b9ibK0twsRidPZGWa7qyJ.', 'Amanda');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `about`
---
-ALTER TABLE `about`
-  ADD PRIMARY KEY (`AID`);
-
---
 -- Indexes for table `contribution`
 --
 ALTER TABLE `contribution`
-  ADD PRIMARY KEY (`CID`),
-  ADD KEY `SID` (`SID`),
-  ADD KEY `AID` (`AID`);
+  ADD PRIMARY KEY (`ContributionID`),
+  ADD KEY `MemberID` (`MemberID`);
 
 --
 -- Indexes for table `eoi`
 --
 ALTER TABLE `eoi`
   ADD PRIMARY KEY (`EOIno`),
-  ADD UNIQUE KEY `ID` (`ID`,`RefNo`),
-  ADD KEY `RefNo` (`RefNo`);
+  ADD KEY `RefNo` (`RefNo`),
+  ADD KEY `eoi_ibfk_2` (`ID`);
 
 --
 -- Indexes for table `hobby`
@@ -364,6 +414,12 @@ ALTER TABLE `role`
   ADD KEY `MemberID` (`MemberID`);
 
 --
+-- Indexes for table `task`
+--
+ALTER TABLE `task`
+  ADD PRIMARY KEY (`TaskID`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -375,22 +431,16 @@ ALTER TABLE `user`
 --
 
 --
--- AUTO_INCREMENT for table `about`
---
-ALTER TABLE `about`
-  MODIFY `AID` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `contribution`
 --
 ALTER TABLE `contribution`
-  MODIFY `CID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ContributionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `eoi`
 --
 ALTER TABLE `eoi`
-  MODIFY `EOIno` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `EOIno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `hobby`
@@ -429,10 +479,16 @@ ALTER TABLE `role`
   MODIFY `RoleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `task`
+--
+ALTER TABLE `task`
+  MODIFY `TaskID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
@@ -442,8 +498,7 @@ ALTER TABLE `user`
 -- Constraints for table `contribution`
 --
 ALTER TABLE `contribution`
-  ADD CONSTRAINT `contribution_ibfk_1` FOREIGN KEY (`SID`) REFERENCES `member` (`MemberID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `contribution_ibfk_2` FOREIGN KEY (`AID`) REFERENCES `about` (`AID`) ON DELETE CASCADE;
+  ADD CONSTRAINT `contribution_ibfk_1` FOREIGN KEY (`MemberID`) REFERENCES `member` (`MemberID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `eoi`
