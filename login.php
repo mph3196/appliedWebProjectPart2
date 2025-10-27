@@ -8,9 +8,6 @@ $pageTitle = 'JSM Login Page';
 $pageDescription = 'Login page for JSM website';
 $pageHeading = 'Login';
 
-include 'header.inc';
-include 'nav.inc';
-
 // includes settings file
 require "settings.php";
 // Disable MySQLi exceptions
@@ -33,6 +30,14 @@ if (!$conn) {
     // If connection failed displays error messgae
     $conn_error = "Unable to connect to the database.";
 }
+// Sign Up message
+if (isset($_GET['message'])) {
+    $message = htmlspecialchars($_GET['message']);
+    echo '<div style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin: 10px 0;">';
+    echo $message;
+    echo '</div>';
+}
+
 
 // Handle login attempt by form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -84,7 +89,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     exit;
 }
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="<?php echo $pageDescription; ?>">
+  <meta name="keywords" content="HTML5, CSS layout, web technology project, PHP, MySQL, Database, Apache, XAMPP">
+  <meta name="author" content="Morgan Hopkins, Jonathon Taylor, Shaun Vambe">
+  <title><?php echo $pageTitle; ?></title>
+  
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!-- CSS Styles for the login page, Produced by GenAI GPT5 -->
     <style>
         * {
@@ -178,6 +193,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             text-align: center;
         }
     </style>
+</head>
+
+<header>
+  <div class="header-left">
+    <img src="images/logo1.png" alt="JSM University Logo" class="header-logo">
+    <h1><strong><?php echo $pageHeading; ?></strong></h1>
+  </div>
+
+<!--Include navigation file for consistent menu -->
+  <?php include 'nav.inc'; ?>
+
     <div class="main-content-area">
         <h2><?php echo $pageHeading; ?></h2>
         <?php 

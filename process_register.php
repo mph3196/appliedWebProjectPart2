@@ -64,7 +64,7 @@ $stmt->bind_param("sss",
 try {
     $stmt->execute();
     // Success
-    header('Location: login.php');
+    header('Location: login.php?message=Successfully Signed Up');
     exit;
 } catch (mysqli_sql_exception $e) {
     // Check for duplicate entry
