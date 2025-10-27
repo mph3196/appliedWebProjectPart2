@@ -20,32 +20,32 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error()); //terminate the execution of the current PHP script
 }
 
-// ===== Fetch all Data Required =====
+//  Fetch all Data Required 
 
-$sql_jobs = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id"; // Get all jobs
+$sql_jobs = "SELECT RefNo, Title, Salary, ReportsTo, ShortDescription FROM Jobs ORDER BY id"; 
 $jobs_result = mysqli_query($conn, $sql_jobs);
 
-$sql_resp = "SELECT RefNo, Description FROM JobResponsibility ORDER BY RefNo, RespID"; // Get all responsibilities
+$sql_resp = "SELECT RefNo, Description FROM JobResponsibility ORDER BY RefNo, RespID"; 
 $resp_result = mysqli_query($conn, $sql_resp);
 
-$sql_ess = "SELECT RefNo, Description FROM JobEssential ORDER BY RefNo, EssentialID"; // Get all essential requirements
+$sql_ess = "SELECT RefNo, Description FROM JobEssential ORDER BY RefNo, EssentialID"; 
 $ess_result = mysqli_query($conn, $sql_ess);
 
-$sql_pref = "SELECT RefNo, Description FROM JobPreferable ORDER BY RefNo, PreferableID"; // Get all preferable requirements
+$sql_pref = "SELECT RefNo, Description FROM JobPreferable ORDER BY RefNo, PreferableID"; 
 $pref_result = mysqli_query($conn, $sql_pref);
 
 
-// ===== Organise Data in Arrays =====
+//  Organise Data in Arrays 
 
-$responsibilities = []; // Stores responsibilities by RefNo
+$responsibilities = []; 
 while ($row = mysqli_fetch_assoc($resp_result)) {
     $responsibilities[$row['RefNo']][] = $row['Description']; }
 
-$essentials = []; // Store essential requirements by RefNo
+$essentials = []; 
 while ($row = mysqli_fetch_assoc($ess_result)) {
     $essentials[$row['RefNo']][] = $row['Description']; }
 
-$preferables = []; // Store preferable requirements by RefNo
+$preferables = []; 
 while ($row = mysqli_fetch_assoc($pref_result)) {
     $preferables[$row['RefNo']][] = $row['Description']; }
 ?>
@@ -87,7 +87,7 @@ while ($row = mysqli_fetch_assoc($pref_result)) {
 
 <?php
 
-// ===== Display all Jobs =====
+//  Display all Jobs 
 
 while ($job = mysqli_fetch_assoc($jobs_result)) { // Fetches one row as an associative array.
     $refNo = $job['RefNo']; 
