@@ -30,6 +30,14 @@ if (!$conn) {
     // If connection failed displays error messgae
     $conn_error = "Unable to connect to the database.";
 }
+// Sign Up message
+if (isset($_GET['message'])) {
+    $message = htmlspecialchars($_GET['message']);
+    echo '<div style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin: 10px 0;">';
+    echo $message;
+    echo '</div>';
+}
+
 
 // Handle login attempt by form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
