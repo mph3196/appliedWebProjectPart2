@@ -85,10 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
+<!-- CSS Styles for the login page, Produced by GenAI GPT5 -->
     <style>
         * {
             font-family: Arial, sans-serif;
@@ -181,8 +178,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             text-align: center;
         }
     </style>
-</head>
-<body>
     <div class="main-content-area">
         <h2><?php echo $pageHeading; ?></h2>
         <?php 
@@ -212,5 +207,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 // Closes database connection
 mysqli_close($conn);
 ?>
-</body>
 <?php include 'footer.inc'; ?>

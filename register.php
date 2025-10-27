@@ -8,8 +8,7 @@ $pageHeading = 'JSM Signup Page';
 include 'header.inc';
 include 'nav.inc';
 ?>
-
-<head>
+<!-- CSS Styles for the register page, Produced by GenAI GPT5 -->
     <style>
         * {
             font-family: Arial, sans-serif;
@@ -102,8 +101,6 @@ include 'nav.inc';
             text-align: center;
         }
     </style>
-</head>
-<body>
     <div class="main-content-area">
         <h2><?php echo $currentPage; ?></h2> 
         
