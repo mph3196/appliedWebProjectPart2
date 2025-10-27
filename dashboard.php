@@ -27,10 +27,6 @@ $pageTitle = 'JSM Dashboard Page';
 $pageDescription = 'Dashboard page for users in JSM website';
 $pageHeading = 'Your Application Dashboard';
 
-include 'header.inc';
-include 'nav.inc';
-
-
 //database settings file
 require_once "settings.php";
 // Connect to the database with settings content
@@ -49,7 +45,20 @@ $query = "SELECT RefNo, ApplyDate, FirstName, LastName, Skills, OtherSkills, Sta
           ORDER BY ApplyDate DESC";
 
 $result = mysqli_query($conn, $query);
+
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="<?php echo $pageDescription; ?>">
+  <meta name="keywords" content="HTML5, CSS layout, web technology project, PHP, MySQL, Database, Apache, XAMPP">
+  <meta name="author" content="Morgan Hopkins, Jonathon Taylor, Shaun Vambe">
+  <title><?php echo $pageTitle; ?></title>
+  
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- CSS Styles for the dashboard page, Produced by GenAI GPT5 -->
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -134,6 +143,16 @@ $result = mysqli_query($conn, $query);
         font-weight: bold;
     }
 </style>
+</head>
+
+<header>
+  <div class="header-left">
+    <img src="images/logo1.png" alt="JSM University Logo" class="header-logo">
+    <h1><strong><?php echo $pageHeading; ?></strong></h1>
+  </div>
+
+<!--Include navigation file for consistent menu -->
+  <?php include 'nav.inc'; ?>
 
 <header style="display:flex; justify-content:space-between; align-items:center; background:#1976d2; color:white; padding:1em;">
     <h2 style="margin:0;">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></h2>
