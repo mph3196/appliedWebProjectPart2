@@ -138,9 +138,8 @@ while ($member = mysqli_fetch_assoc($members)) {
             <?php
             $sql = "SELECT * FROM Member";
             $members = mysqli_query($conn, $sql);
-
-            echo "<tr>";
             while ($member = mysqli_fetch_assoc($members)) {
+                echo "<tr>";
                 echo "<td><strong>{$member['FullName']}</strong></td>";
                 echo "<td>{$member['DreamJob']}</td>";
                 echo "<td>{$member['CodingSnack']}</td>";
