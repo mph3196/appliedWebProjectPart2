@@ -282,7 +282,7 @@ include 'header.inc';
 include 'nav.inc';
 ?>
 
-<!-- CSS Styles for the management interface -->
+<!-- CSS Styles for the manage page, Produced by GenAI GPT5 -->
 <style>
     body {
         font-family: Arial, sans-serif;
