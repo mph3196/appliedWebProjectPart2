@@ -1,7 +1,7 @@
 <?php
 // NOTE: Incorporated work referenced to https://www.w3schools.com/php/
 // Jonathon Taylor: Altered from interview, feedback was to simplify and minimise
-// I incorporated arrays and moved queries out of loops and now only use 4 queries instead of my original 13 
+// I incorporated arrays and moved queries out of loops and now only use 4 queries instead of my original 13. 
 
 // Define Specific Page Variables
 $currentPage = 'jobs'; 
