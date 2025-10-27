@@ -1,11 +1,14 @@
 <?php
+// Get server settings
 require_once 'settings.php';
 
+// Page meta settings
 $currentPage = 'about';
 $pageTitle = 'JSM About Us Page';
 $pageDescription = 'About page for JSM University';
 $pageHeading = 'About Us';
 
+// Include header and footer
 include 'header.inc';
 include 'nav.inc';
 
@@ -24,10 +27,12 @@ if (!$conn) {
     exit;
 }
 if (!$conn) {
+    // Database connection error
     echo "<p>Connection failed: " . mysqli_connect_error() . "</p>";
 }
 ?>
 
+<!-- About page introduction -->
 <h1><strong>Who are We</strong></h1> 
 <p class="aboutus">
 At JSM University, we are more than just a place of learning—we are a community committed to shaping future leaders, innovators, and changemakers. Founded on the values of excellence, integrity, and inclusivity, JSM University provides a dynamic environment where students are empowered to explore their potential, challenge ideas, and make meaningful contributions to society.
@@ -63,6 +68,7 @@ Above all, we are committed to nurturing minds and inspiring futures—helping e
     <h3><strong>Student ID's</strong></h3>
     <ul>
         <?php
+        // select all members and display their full nameds and studend ID numbers
         $sql = "SELECT * FROM Member";
         $members = mysqli_query($conn, $sql);
 
@@ -79,6 +85,7 @@ $sql = "SELECT * FROM Member";
 $members = mysqli_query($conn, $sql);
 
 while ($member = mysqli_fetch_assoc($members)) {
+    // Full name and Bio
     echo '<div class="container">';
     echo "<div class=\"header\"><strong>{$member['FullName']}</strong></div>";
     echo "<p>{$member['Bio']}</p>";
@@ -120,7 +127,7 @@ while ($member = mysqli_fetch_assoc($members)) {
     echo "<p><strong>Favourite Quote in {$member['FavLanguage']}:</strong> 
       <span lang=\"{$member['LangCode']}\">\"{$member['FavQuote']}\"</span></p>";
 
-    echo "</div>"; // end container
+    echo "</div>";
 }
 ?>
 
@@ -136,6 +143,7 @@ while ($member = mysqli_fetch_assoc($members)) {
         </tr>
         <tbody>
             <?php
+            // Create a table to display some fun facts about each member
             $sql = "SELECT * FROM Member";
             $members = mysqli_query($conn, $sql);
             while ($member = mysqli_fetch_assoc($members)) {
@@ -152,6 +160,7 @@ while ($member = mysqli_fetch_assoc($members)) {
 </div>
 
 <?php
+// Include footer
 mysqli_close($conn);
 include 'footer.inc';
 ?>
